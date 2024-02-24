@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Datitos</title>
+    <link rel="stylesheet" href="normalize.css" type="text/css" />
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" type="text/css"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <script src="script.js"></script>
+  </head>
+
+  <body>
+    <h1>
+      <a href="./index.html">Datitos</a>
+    </h1>
+    <h2>Conocé qué <i>pack</i> te conviene más</h2>
+    <div class="contenedor centrado">
+      <h3>General</h3>
+      <input id="id" type="hidden">
+      <p>
+        Uso promedio diario:
+        <input id="diario" type="number" placeholder="500" required> MBs
+      </p>
+      <p>
+        Próxima renovación del plan:
+        <input id="renovacion" type="date">
+      </p>
+      <div>
+        <span class="item i-enlace" id="aplicar" onclick="actualizarConfig()">
+          <i class="fa fa-wrench"></i>
+          Aplicar
+        </span>
+      </div>
+    </div>
+
+    <div class="contenedor centrado">
+      <h3>Pack</h3>
+      <div class="pack">
+        <!-- <div class="campos"> -->
+        <p>
+          Nombre (opcional): <input id="nombre" type="text" placeholder="Diario">
+        </p>
+        <p>
+          <input id="mbs" type="number" placeholder="50" required> MBs a $
+          <input id="precio" type="number" placeholder="180" required> por
+          <input id="dias" type="number" placeholder="1" required> día/s
+        </p>
+        <p>Escribí 0 en días si dura hasta la renovación del plan.</p>
+        <!-- </div> -->
+      </div>
+      <div>
+        <span class="item i-enlace" id="guardar" onclick="guardarPack()">
+          <i class="fa fa-save"></i>
+          Guardar
+        </span>
+      </div>
+    </div>
+
+    <div class="contenedor">
+      <h3>Ranking</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Opción</th>
+            <th>MBs</th>
+            <th>Precio</th>
+            <th>Días</th>
+            <th>Mensual</th>
+            <th>
+              <i class="fa fa-gear"></i>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="nota ">
+      <h3>Sobre</h3>
+      <p>
+        El ranking se ordena según la columna <span>Mensual</span>. Muestra cuánto saldría usar la opción por 30 días
+        según el uso diario promedio. Es decir, consumiendo lo indicado y volviendo a comprar cuando se acabe, las veces
+        que sea necesario.
+      </p>
+      <h4>
+        &copy; CrysoK
+      </h4>
+    </div>
+  </body>
+  <!-- CrysoK -->
+
+</html>

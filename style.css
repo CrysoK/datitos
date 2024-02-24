@@ -1,0 +1,238 @@
+@import url("https://fonts.googleapis.com/css2?family=Jost:wght@100;300;400;700&display=swap");
+
+html {
+  overflow-y: scroll;
+}
+
+body {
+  background-color: #3333992c;
+  font-family: "Jost", sans-serif;
+  color: #232c3d;
+}
+
+p {
+  margin: .5rem;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:visited {
+  color: inherit;
+}
+
+h1 {
+  color: #333399;
+  font-size: 48px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 20px;
+  text-align: center;
+}
+
+h3 {
+  margin-top: 0;
+  margin-bottom: .75rem;
+  /* padding: 1rem; */
+}
+
+h4 {
+  margin-bottom: 0;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  /* border: 1px solid lightgrey; */
+}
+
+tbody tr:hover {
+  /* background-color: #3333992c; */
+  background-color: #f5f5f5;
+
+}
+
+th,
+td {
+  border: 1px solid lightgrey;
+  padding: .5rem;
+}
+
+.campos {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+}
+
+
+input {
+  padding: 10px;
+  /* margin: 10px auto; */
+  /* display: block; */
+  border-radius: 5px;
+  border: 1px solid lightgrey;
+  background: none;
+  width: 4rem;
+  color: black;
+}
+
+input:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px #333399;
+  border: 1px solid #00000000;
+}
+
+#renovacion {
+  width: 7.5rem;
+}
+
+#dias {
+  width: 2.7rem;
+}
+
+.centrado {
+  text-align: center;
+}
+
+.contenedor {
+  /* display: block; */
+  width: 400px;
+  margin: 1.5rem auto;
+  padding: .75rem;
+  border-radius: 5px;
+  background: white;
+}
+
+.item {
+  padding: 10px;
+  margin: 10px auto;
+  display: block;
+  border-radius: 5px;
+  border: 1px solid lightgrey;
+  background: none;
+  width: 90%;
+  color: black;
+}
+
+.nota {
+  max-width: 400px;
+  padding: 10px;
+  margin: 10px auto;
+  display: block;
+  border-radius: 5px;
+  background: #333399;
+  color: white;
+}
+
+.warn {
+  padding: 10px;
+  margin: 10px auto;
+  display: block;
+  border-radius: 5px;
+  background: #993333;
+  width: 90%;
+  color: white;
+}
+
+.controles {
+  width: 90%;
+  margin: 10px auto;
+}
+
+.nuevo {
+  cursor: pointer;
+}
+
+
+.fa-pencil {
+  cursor: pointer;
+  float: left;
+}
+
+.fa-trash {
+  cursor: pointer;
+  float: right;
+  /* visibility: hidden; */
+}
+
+.fa-pencil:hover {
+  color: blue;
+}
+
+.fa-trash:hover {
+  color: red;
+}
+
+.calcular {
+  max-width: 400px;
+  margin: 25px auto;
+  padding: 10px;
+  border-radius: 5px;
+  background: #232c3d;
+  color: white;
+  text-align: center;
+}
+
+.resultado {
+  /* display: none; */
+  max-width: 400px;
+  margin: 25px auto;
+  padding: 10px;
+  border-radius: 5px;
+  background: white;
+  color: rgb(0, 0, 0);
+  text-align: center;
+  border: 1px solid lightgrey;
+}
+
+.controles a i {
+  margin-right: 5px;
+}
+
+.i-enlace:hover {
+  cursor: pointer;
+  box-shadow: 0 0 0 1px #333399;
+  background-color: #3333992c;
+  color: #333399;
+  border: 1px solid #00000000;
+}
+
+.exito,
+.exito:hover {
+  border-color: green;
+  color: green;
+}
+
+.error,
+.error:hover {
+  border-color: red;
+  color: red;
+}
+
+@media only screen and (max-width: 460px) {
+  .contenedor {
+    width: auto;
+    margin: 10px auto;
+    padding: 5px;
+  }
+
+  .calcular {
+    width: auto;
+    margin: 10px auto;
+  }
+
+  .resultado {
+    width: auto;
+    margin: 10px auto;
+  }
+
+  .nota {
+    width: auto;
+    margin: 10px auto;
+  }
+}
