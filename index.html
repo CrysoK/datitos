@@ -1,66 +1,91 @@
 <!DOCTYPE html>
 <html>
-
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Datitos</title>
+    <title>Datitos - Compara packs de datos</title>
     <link rel="stylesheet" href="normalize.css" type="text/css" />
     <link href="style.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css"
       href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
     <script src="script.js"></script>
   </head>
-
   <body>
     <h1>
       <a href="./index.html">Datitos</a>
     </h1>
-    <h2>Conocé qué <i>pack</i> te conviene más</h2>
-    <div class="contenedor centrado">
-      <h3>General</h3>
-      <input id="id" type="hidden">
-      <p>
-        Uso promedio diario:
-        <input id="diario" type="number" placeholder="500" required> MBs
-      </p>
-      <p>
-        Próxima renovación del plan:
-        <input id="renovacion" type="date">
-      </p>
-      <div>
-        <span class="item i-enlace" id="aplicar" onclick="actualizarConfig()">
-          <i class="fa fa-wrench"></i>
-          Aplicar
-        </span>
-      </div>
-    </div>
-
-    <div class="contenedor centrado">
-      <h3>Pack</h3>
-      <div class="pack">
-        <!-- <div class="campos"> -->
-        <p>
-          Nombre (opcional): <input id="nombre" type="text" placeholder="Diario">
-        </p>
-        <p>
-          <input id="mbs" type="number" placeholder="50" required> MBs a $
-          <input id="precio" type="number" placeholder="180" required> por
-          <input id="dias" type="number" placeholder="1" required> día/s
-        </p>
-        <p>Escribí 0 en días si dura hasta la renovación del plan.</p>
-        <!-- </div> -->
-      </div>
-      <div>
-        <span class="item i-enlace" id="guardar" onclick="guardarPack()">
-          <i class="fa fa-save"></i>
-          Guardar
-        </span>
-      </div>
+    <h2>Compara packs de datos y descubre cuál te conviene más</h2>
+    <div class="intro-text centrado">
+      <p>Ingresa tu consumo diario y los detalles de los packs que quieres comparar. Datitos calculará el costo mensual
+        estimado para cada uno.</p>
     </div>
 
     <div class="contenedor">
-      <h3>Ranking</h3>
+      <fieldset>
+        <legend>1. Configuración general</legend>
+        <div>
+          <label for="diario">Mi uso promedio diario:</label>
+          <input id="diario" type="number" placeholder="Ej: 500" required aria-describedby="diarioHelp"> MBs
+          <small id="diarioHelp" class="form-text">¿Cuántos MBs gastas aproximadamente cada día?</small>
+        </div>
+        <div>
+          <label for="renovacion">Próxima renovación de mi plan:</label>
+          <input id="renovacion" type="date" aria-describedby="renovacionHelp">
+          <small id="renovacionHelp" class="form-text">
+            Opcional. Necesario si un pack dura "hasta la renovación" (es decir, ingresas '0 días' para ese pack).
+          </small>
+        </div>
+        <div>
+          <button type="button" class="btn btn-primary" id="aplicar" onclick="actualizarConfig()">
+            <i class="fa fa-wrench"></i>
+            Guardar configuración y recalcular
+          </button>
+          <small class="form-text centrado">Esto guardará tu consumo y fecha, y recalculará el ranking.</small>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="contenedor">
+      <fieldset>
+        <legend>2. Añadir o editar un pack de datos</legend>
+        <input id="id" type="hidden">
+        <div>
+          <label for="nombre">Nombre del pack (opcional):</label>
+          <input id="nombre" type="text" placeholder="Ej: Pack Semanal, Promo Verano">
+          <small class="form-text">Un nombre para identificarlo fácilmente en el ranking.</small>
+        </div>
+        <div class="pack-details">
+          <p><strong>Detalles del pack:</strong></p>
+          <div>
+            <label for="mbs">MBs que incluye:</label>
+            <input id="mbs" type="number" placeholder="Ej: 1000" required> MBs
+          </div>
+          <div>
+            <label for="precio">Precio:</label>
+            $ <input id="precio" type="number" placeholder="Ej: 180" required>
+          </div>
+          <div>
+            <label for="dias">Duración:</label>
+            <input id="dias" type="number" placeholder="Ej: 7" required aria-describedby="diasHelp"> día/s
+          </div>
+        </div>
+        <small id="diasHelp" class="form-text">
+          Ingresa `0` si el pack dura hasta la fecha de renovación de tu plan (indicada en la Configuración General).
+        </small>
+        <div>
+          <button type="button" class="btn btn-primary" id="guardar" onclick="guardarPack()">
+            <i class="fa fa-save"></i>
+            Guardar pack y añadir al ranking
+          </button>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="contenedor">
+      <h3>3. Ranking de conveniencia</h3>
+      <p class="ranking-info">Ordenado por "costo mensual estimado" (el más
+      barato primero). Este costo considera tu uso diario y la necesidad de
+      recomprar el pack.</p>
       <table>
         <thead>
           <tr>
@@ -68,10 +93,10 @@
             <th>MBs</th>
             <th>Precio</th>
             <th>Días</th>
-            <th>Mensual</th>
-            <th>
-              <i class="fa fa-gear"></i>
-            </th>
+            <th title="Costo estimado para 30 días, considerando tu uso diario y
+            recomprando el pack las veces que sea necesario.">
+              Mensual <i class="fa fa-info-circle"></i></th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -79,18 +104,18 @@
       </table>
     </div>
 
-    <div class="nota ">
-      <h3>Sobre</h3>
+    <div class="nota">
+      <h3>Sobre "Datitos"</h3>
       <p>
-        El ranking se ordena según la columna <span>Mensual</span>. Muestra cuánto saldría usar la opción por 30 días
-        según el uso diario promedio. Es decir, consumiendo lo indicado y volviendo a comprar cuando se acabe, las veces
-        que sea necesario.
+        El ranking se ordena según la columna <span>Mensual</span>. Esta cifra muestra cuánto
+        teóricamente gastarías en 30 días si usaras exclusivamente esa opción de pack.
+        Se calcula en base a tu "uso promedio diario": si consumes todos los MBs del pack antes de que expire, se asume
+        que lo vuelves a comprar. Si el pack expira antes de que consumas todos los MBs, se asume que lo compras al
+        finalizar su duración.
       </p>
       <h4>
-        &copy; CrysoK
+        © CrysoK
       </h4>
     </div>
   </body>
-  <!-- CrysoK -->
-
 </html>
