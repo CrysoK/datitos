@@ -40,9 +40,8 @@
 
     <main>
       <div class="intro-text centrado">
-        <p>Ingresa tu consumo diario y los detalles de los packs que quieres comparar. Datitos calculará el costo
-          mensual
-          estimado para cada uno.</p>
+        <p>Ingresa tu consumo diario y los packs a comparar. Datitos calculará el costo mensual estimado para cada uno.
+        </p>
       </div>
     </main>
 
@@ -52,21 +51,20 @@
         <div>
           <label for="diario">Mi uso promedio diario:</label>
           <input id="diario" type="number" placeholder="Ej: 500" required aria-describedby="diarioHelp"> MBs
-          <small id="diarioHelp" class="form-text">¿Cuántos MBs gastas aproximadamente cada día?</small>
+          <small id="diarioHelp" class="form-text">Tu consumo diario promedio en MB.</small>
         </div>
         <div>
           <label for="renovacion">Próxima renovación de mi plan:</label>
           <input id="renovacion" type="date" aria-describedby="renovacionHelp">
           <small id="renovacionHelp" class="form-text">
-            Opcional. Necesario si un pack dura "hasta la renovación" (es decir, ingresas '0 días' para ese pack).
-          </small>
+            Opcional. Requerido si un pack dura hasta tu renovación (al ingresar '0' días).</small>
         </div>
         <div>
           <button type="button" class="btn btn-primary" id="aplicar" onclick="actualizarConfig()">
             <i class="fa fa-wrench"></i>
             Guardar configuración y recalcular
           </button>
-          <small class="form-text centrado">Esto guardará tu consumo y fecha, y recalculará el ranking.</small>
+          <small class="form-text centrado">Guarda tu consumo y fecha para actualizar el ranking.</small>
         </div>
       </fieldset>
     </section>
@@ -78,7 +76,7 @@
         <div>
           <label for="nombre">Nombre del pack (opcional):</label>
           <input id="nombre" type="text" placeholder="Ej: Pack Semanal, Promo Verano">
-          <small class="form-text">Un nombre para identificarlo fácilmente en el ranking.</small>
+          <small class="form-text">Un apodo para identificarlo en el ranking.</small>
         </div>
         <div class="pack-details">
           <p><strong>Detalles del pack:</strong></p>
@@ -96,7 +94,7 @@
           </div>
         </div>
         <small id="diasHelp" class="form-text">
-          Ingresa `0` si el pack dura hasta la fecha de renovación de tu plan (indicada en la Configuración General).
+          Ingresa `0` si el pack vence en la fecha de renovación de tu plan.
         </small>
         <div>
           <button type="button" class="btn btn-primary" id="guardar" onclick="guardarPack()">
@@ -109,9 +107,8 @@
 
     <section class="contenedor">
       <h3>3. Ranking de conveniencia</h3>
-      <p class="ranking-info">Ordenado por "costo mensual estimado" (el más
-        barato primero). Este costo considera tu uso diario y la necesidad de
-        recomprar el pack.</p>
+      <p class="ranking-info">Ordenado por costo mensual estimado (el más barato primero). El cálculo considera tu
+        consumo y si necesitas recomprar el pack.</p>
       <table>
         <thead>
           <tr>
@@ -119,8 +116,7 @@
             <th>MBs</th>
             <th>Precio</th>
             <th>Días</th>
-            <th title="Costo estimado para 30 días, considerando tu uso diario y
-            recomprando el pack las veces que sea necesario.">
+            <th title="Costo estimado para 30 días, basado en tu consumo diario y la recompra del pack.">
               Mensual <i class="fa fa-info-circle"></i></th>
             <th>Acciones</th>
           </tr>
@@ -133,19 +129,24 @@
     <footer class="nota">
       <h3>Sobre "Datitos"</h3>
       <p>
-        El ranking se ordena según la columna <span>Mensual</span>. Esta cifra muestra cuánto
-        teóricamente gastarías en 30 días si usaras exclusivamente esa opción de pack.
-        Se calcula en base a tu "uso promedio diario": si consumes todos los MBs del pack antes de que expire, se
-        asume
-        que lo vuelves a comprar. Si el pack expira antes de que consumas todos los MBs, se asume que lo compras al
-        finalizar su duración.
+        El ranking se ordena por tu gasto <span>Mensual</span> estimado. Este cálculo se basa en tu consumo diario,
+        asumiendo que recompras el pack si se te acaban los datos o cuando vence su duración.
       </p>
-      <h4>
-        © CrysoK
+      <h4 id="copyright-notice">
       </h4>
     </footer>
 
     <script src="script.js" defer></script>
+    <script>
+      const startYear = 2024;
+      const currentYear = new Date().getFullYear();
+      const copyrightElement = document.getElementById('copyright-notice');
+      let yearString = startYear.toString();
+      if (currentYear > startYear) {
+        yearString = `${startYear} - ${currentYear}`;
+      }
+      copyrightElement.textContent = `© ${yearString} CrysoK`;
+    </script>
   </body>
 
 </html>
