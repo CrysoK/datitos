@@ -1,29 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="favicon.png" />
-    <title>Datitos - Compara packs de datos</title>
+    <title>Datitos | Compara packs de datos</title>
+    <meta name="description"
+      content="Ahorra dinero en tu plan de datos móviles. Con Datitos, puedes comparar fácilmente diferentes packs de datos según tu consumo diario y encontrar la opción más económica. ¡Calcula tu costo mensual estimado ahora!" />
+    <link rel="canonical" href="https://datitos.vercel.app/" />
+    <meta name="keywords"
+      content="comparar datos moviles, ahorrar datos, pack de datos, calculadora de datos, plan de datos, costo mensual datos, movistar, personal, claro, tuenti, argentina" />
+    <meta property="og:title" content="Datitos | Compara packs de datos" />
+    <meta property="og:description"
+      content="Ingresa tu consumo y los detalles de los packs para descubrir cuál te conviene más y reducir tu gasto mensual." />
+    <!-- <meta property="og:image" content="https://datitos.vercel.app/og-image.png" /> -->
+    <meta property="og:url" content="https://datitos.vercel.app/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:site_name" content="Datitos" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Datitos | Compara packs de datos" />
+    <meta name="twitter:description"
+      content="Ingresa tu consumo y los detalles de los packs para descubrir cuál te conviene más y reducir tu gasto mensual." />
+    <!-- <meta name="twitter:image" content="https://datitos.vercel.app/og-image.png" /> -->
     <link rel="stylesheet" href="normalize.css" type="text/css" />
     <link href="style.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css"
       href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
-    <script src="script.js"></script>
   </head>
 
   <body>
-    <h1>
-      <a href="./index.html">Datitos</a>
-    </h1>
-    <h2>Compara packs de datos y descubre cuál te conviene más</h2>
-    <div class="intro-text centrado">
-      <p>Ingresa tu consumo diario y los detalles de los packs que quieres comparar. Datitos calculará el costo mensual
-        estimado para cada uno.</p>
-    </div>
+    <header>
+      <h1>
+        <a href="./index.html">Datitos</a>
+      </h1>
+      <h2>Compara packs de datos y descubre cuál te conviene más</h2>
+    </header>
 
-    <div class="contenedor">
+    <main>
+      <div class="intro-text centrado">
+        <p>Ingresa tu consumo diario y los detalles de los packs que quieres comparar. Datitos calculará el costo
+          mensual
+          estimado para cada uno.</p>
+      </div>
+    </main>
+
+    <section class="contenedor">
       <fieldset>
         <legend>1. Configuración general</legend>
         <div>
@@ -46,9 +69,9 @@
           <small class="form-text centrado">Esto guardará tu consumo y fecha, y recalculará el ranking.</small>
         </div>
       </fieldset>
-    </div>
+    </section>
 
-    <div class="contenedor">
+    <section class="contenedor">
       <fieldset>
         <legend>2. Añadir o editar un pack de datos</legend>
         <input id="id" type="hidden">
@@ -82,9 +105,9 @@
           </button>
         </div>
       </fieldset>
-    </div>
+    </section>
 
-    <div class="contenedor">
+    <section class="contenedor">
       <h3>3. Ranking de conveniencia</h3>
       <p class="ranking-info">Ordenado por "costo mensual estimado" (el más
         barato primero). Este costo considera tu uso diario y la necesidad de
@@ -105,21 +128,24 @@
         <tbody>
         </tbody>
       </table>
-    </div>
+    </section>
 
-    <div class="nota">
+    <footer class="nota">
       <h3>Sobre "Datitos"</h3>
       <p>
         El ranking se ordena según la columna <span>Mensual</span>. Esta cifra muestra cuánto
         teóricamente gastarías en 30 días si usaras exclusivamente esa opción de pack.
-        Se calcula en base a tu "uso promedio diario": si consumes todos los MBs del pack antes de que expire, se asume
+        Se calcula en base a tu "uso promedio diario": si consumes todos los MBs del pack antes de que expire, se
+        asume
         que lo vuelves a comprar. Si el pack expira antes de que consumas todos los MBs, se asume que lo compras al
         finalizar su duración.
       </p>
       <h4>
         © CrysoK
       </h4>
-    </div>
+    </footer>
+
+    <script src="script.js" defer></script>
   </body>
 
 </html>
