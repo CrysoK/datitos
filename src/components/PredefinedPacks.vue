@@ -3,29 +3,29 @@
     <div class="section-header">
       <h3>Comparar Packs</h3>
       <div class="header-btns">
-        <button class="nuevo-pack-btn" @click="$emit('nuevo-pack', { country: filters.country, company: filters.company, type: filters.offer })">
-          <PlusCircle :size="16" />
-          Nuevo pack
+        <button class="filter-toggle-btn" :class="{ 'active': showFilters }" @click="toggleFilters">
+          <Filter :size="16" />
+          <span>Filtros</span>
+          <ChevronDown v-if="!showFilters" :size="16" />
+          <ChevronUp v-else :size="16" />
         </button>
         <button class="refresh-btn" :class="{ loading }" @click="$emit('refresh-predefined')" :disabled="loading">
           <RefreshCw :size="16" :class="{ 'spin': loading }" />
           {{ loading ? 'Actualizando...' : 'Actualizar' }}
         </button>
+        <button class="nuevo-pack-btn" @click="$emit('nuevo-pack', { country: filters.country, company: filters.company, type: filters.offer })">
+          <PlusCircle :size="16" />
+          Nuevo pack
+        </button>
       </div>
     </div>
 
-    <div v-if="loading && predefinedPacks.length === 0" class="loading-state">
-      <div class="spinner"></div>
-      <p>Cargando datos desde GitHub...</p>
+    <div v-if="!showFilters" class="filter-summary-bar" @click="showFilters = true">
+      <Filter :size="14" />
+      <span>{{ filterSummary }}</span>
     </div>
 
-    <div v-else-if="predefinedPacks.length === 0" class="empty-state">
-      <AlertTriangle :size="48" />
-      <p>No se encontraron packs precargados</p>
-      <button class="retry-btn" @click="$emit('refresh-predefined')">Intentar cargar de nuevo</button>
-    </div>
-
-    <div v-else class="filters-container">
+    <div v-show="showFilters" class="filters-container">
       <div class="filter-group">
         <label>Origen:</label>
         <select v-model="filters.source">
@@ -54,6 +54,17 @@
           <option v-for="o in availableOffers" :key="o.value" :value="o.value">{{ o.label }}</option>
         </select>
       </div>
+    </div>
+
+    <div v-if="loading && predefinedPacks.length === 0" class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando datos desde GitHub...</p>
+    </div>
+
+    <div v-else-if="predefinedPacks.length === 0" class="empty-state">
+      <AlertTriangle :size="48" />
+      <p>No se encontraron packs precargados</p>
+      <button class="retry-btn" @click="$emit('refresh-predefined')">Intentar cargar de nuevo</button>
     </div>
 
     <div v-if="filteredPacks.length === 0" class="empty-state">
@@ -121,7 +132,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import type { PropType } from 'vue'
-import { Pencil, Trash2, PencilLine, AlertTriangle, MessageSquare, Zap, RefreshCw, PlusCircle } from 'lucide-vue-next'
+import { Pencil, Trash2, PencilLine, AlertTriangle, MessageSquare, Zap, RefreshCw, PlusCircle, Filter, ChevronDown, ChevronUp } from 'lucide-vue-next'
 import type { Pack } from '../types'
 import { calcularCosto, _, detectUserCountry, guardarEnLocalStorage, cargarDesdeLocalStorage } from '../utils'
 
@@ -160,6 +171,9 @@ const filters = ref({
   company: null as string | null,
   offer: null as string | null
 })
+
+const showFilters = ref(window.innerWidth > 768)
+const toggleFilters = () => showFilters.value = !showFilters.value
 
 // Persistence
 onMounted(() => {
@@ -266,6 +280,24 @@ const handleContribute = () => {
     packs: filteredPacks.value
   })
 }
+
+const filterSummary = computed(() => {
+  const parts = []
+  
+  // Origen
+  if (filters.value.source === 'community') parts.push('Comunidad')
+  else if (filters.value.source === 'local') parts.push('Propios')
+  
+  if (filters.value.country) parts.push(_(filters.value.country))
+  if (filters.value.company) parts.push(filters.value.company)
+  if (filters.value.offer) {
+    const label = availableOffers.value.find(o => o.value === filters.value.offer)?.label
+    if (label) parts.push(label)
+  }
+  
+  if (parts.length === 0) return 'Todos los packs'
+  return parts.join(' • ')
+})
 </script>
 
 <style scoped>
@@ -273,7 +305,9 @@ const handleContribute = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .section-header h3 {
@@ -281,17 +315,98 @@ const handleContribute = () => {
   font-family: 'Outfit', sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .header-btns {
   display: flex;
   gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.filter-toggle-btn {
+  background: white;
+  border: 1px solid var(--color-borde);
+  color: var(--color-texto);
+  padding: 0.5rem 0.75rem;
+  white-space: nowrap;
+}
+
+.filter-toggle-btn:hover {
+  background: #f8fafc;
+  border-color: var(--color-primario);
+  color: var(--color-primario);
+}
+
+.filter-toggle-btn.active {
+  background: #eef2ff;
+  border-color: var(--color-primario);
+  color: var(--color-primario);
+}
+
+.filter-summary-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border: 1px solid var(--color-borde);
+  border-radius: 10px;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--color-texto-muted);
+  transition: all 0.2s;
+}
+
+.filter-summary-bar:hover {
+  background: #f1f5f9;
+  border-color: var(--color-borde);
+  color: var(--color-texto);
+}
+
+.filter-summary-bar span {
+  font-weight: 600;
+  color: var(--color-primario);
+}
+
+@media (max-width: 640px) {
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .header-btns {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  
+  .nuevo-pack-btn {
+    grid-column: span 2;
+    order: 1;
+  }
+  
+  .filter-toggle-btn {
+    order: 2;
+  }
+  
+  .refresh-btn {
+    order: 3;
+  }
+  
+  .filter-toggle-btn, .refresh-btn, .nuevo-pack-btn {
+    width: 100%;
+    margin: 0;
+  }
 }
 
 .nuevo-pack-btn {
   background: var(--color-primario);
   color: white;
   padding: 0.5rem 1rem;
+  white-space: nowrap;
 }
 
 .nuevo-pack-btn:hover {
@@ -309,6 +424,7 @@ const handleContribute = () => {
   cursor: pointer;
   font-size: 0.875rem;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .refresh-btn:hover:not(:disabled) {
@@ -387,7 +503,7 @@ const handleContribute = () => {
   border: 1px solid var(--color-borde);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .filters-container {
     grid-template-columns: 1fr;
     padding: 1rem;
