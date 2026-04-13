@@ -2,151 +2,38 @@
 <html lang="es">
 
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <title>Datitos | Compara packs de datos</title>
-    <meta name="description"
-      content="Ahorra dinero en tu plan de datos móviles. Con Datitos, puedes comparar fácilmente diferentes packs de datos según tu consumo diario y encontrar la opción más económica. ¡Calcula tu costo mensual estimado ahora!" />
-    <link rel="canonical" href="https://datitos.vercel.app/" />
-    <meta name="keywords"
-      content="comparar datos moviles, ahorrar datos, pack de datos, calculadora de datos, plan de datos, costo mensual datos, movistar, personal, claro, tuenti, argentina" />
-    <meta property="og:title" content="Datitos | Compara packs de datos" />
-    <meta property="og:description"
-      content="Ingresa tu consumo y los detalles de los packs para descubrir cuál te conviene más y reducir tu gasto mensual." />
-    <!-- <meta property="og:image" content="https://datitos.vercel.app/og-image.png" /> -->
-    <meta property="og:url" content="https://datitos.vercel.app/" />
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="es_ES" />
-    <meta property="og:site_name" content="Datitos" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Datitos | Compara packs de datos" />
-    <meta name="twitter:description"
-      content="Ingresa tu consumo y los detalles de los packs para descubrir cuál te conviene más y reducir tu gasto mensual." />
-    <!-- <meta name="twitter:image" content="https://datitos.vercel.app/og-image.png" /> -->
-    <link rel="stylesheet" href="normalize.css" type="text/css" />
-    <link href="style.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" type="text/css"
-      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3b82f6">
+
+    <title>Datitos - Compara packs de datos móviles</title>
+    <meta name="description" content="Calcula y compara el costo real de packs de datos móviles. Optimiza tu consumo y ahorra dinero eligiendo el mejor plan.">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://datitos.crysok.com/">
+    <meta property="og:title" content="Datitos - Compara packs de datos móviles">
+    <meta property="og:description" content="Calcula y compara el costo real de packs de datos móviles. Optimiza tu consumo y ahorra dinero eligiendo el mejor plan.">
+    <meta property="og:image" content="https://datitos.crysok.com/og-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://datitos.crysok.com/">
+    <meta property="twitter:title" content="Datitos - Compara packs de datos móviles">
+    <meta property="twitter:description" content="Calcula y compara el costo real de packs de datos móviles. Optimiza tu consumo y ahorra dinero eligiendo el mejor plan.">
+    <meta property="twitter:image" content="https://datitos.crysok.com/og-image.png">
+
+    <link rel="canonical" href="https://datitos.crysok.com">
+    <!-- <link rel="stylesheet" type="text/css"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /> -->
   </head>
 
   <body>
-    <header>
-      <h1>
-        <a href="./index.html">Datitos</a>
-      </h1>
-      <h2>Compara packs de datos y descubre cuál te conviene más</h2>
-    </header>
-
-    <main>
-      <div class="intro-text centrado">
-        <p>Ingresa tu consumo diario y los packs a comparar. Datitos calculará el costo mensual estimado para cada uno.
-        </p>
-      </div>
-    </main>
-
-    <section class="contenedor">
-      <fieldset>
-        <legend>1. Configuración general</legend>
-        <div>
-          <label for="diario">Mi uso promedio diario:</label>
-          <input id="diario" type="number" placeholder="Ej: 500" required aria-describedby="diarioHelp"> MBs
-          <small id="diarioHelp" class="form-text">Tu consumo diario promedio en MB.</small>
-        </div>
-        <div>
-          <label for="renovacion">Próxima renovación de mi plan:</label>
-          <input id="renovacion" type="date" aria-describedby="renovacionHelp">
-          <small id="renovacionHelp" class="form-text">
-            Opcional. Requerido si un pack dura hasta tu renovación (al ingresar '0' días).</small>
-        </div>
-        <div>
-          <button type="button" class="btn btn-primary" id="aplicar" onclick="actualizarConfig()">
-            <i class="fa fa-wrench"></i>
-            Guardar configuración y recalcular
-          </button>
-          <small class="form-text centrado">Guarda tu consumo y fecha para actualizar el ranking.</small>
-        </div>
-      </fieldset>
-    </section>
-
-    <section class="contenedor">
-      <fieldset>
-        <legend>2. Añadir o editar un pack de datos</legend>
-        <input id="id" type="hidden">
-        <div>
-          <label for="nombre">Nombre del pack (opcional):</label>
-          <input id="nombre" type="text" placeholder="Ej: Pack Semanal, Promo Verano">
-          <small class="form-text">Un apodo para identificarlo en el ranking.</small>
-        </div>
-        <div class="pack-details">
-          <p><strong>Detalles del pack:</strong></p>
-          <div>
-            <label for="mbs">MBs que incluye:</label>
-            <input id="mbs" type="number" placeholder="Ej: 1000" required> MBs
-          </div>
-          <div>
-            <label for="precio">Precio:</label>
-            $ <input id="precio" type="number" placeholder="Ej: 180" required>
-          </div>
-          <div>
-            <label for="dias">Duración:</label>
-            <input id="dias" type="number" placeholder="Ej: 7" required aria-describedby="diasHelp"> día/s
-          </div>
-        </div>
-        <small id="diasHelp" class="form-text">
-          Ingresa `0` si el pack vence en la fecha de renovación de tu plan.
-        </small>
-        <div>
-          <button type="button" class="btn btn-primary" id="guardar" onclick="guardarPack()">
-            <i class="fa fa-save"></i>
-            Guardar pack y añadir al ranking
-          </button>
-        </div>
-      </fieldset>
-    </section>
-
-    <section class="contenedor">
-      <h3>3. Ranking de conveniencia</h3>
-      <p class="ranking-info">Ordenado por costo mensual estimado (el más barato primero). El cálculo considera tu
-        consumo y si necesitas recomprar el pack.</p>
-      <table>
-        <thead>
-          <tr>
-            <th>Opción</th>
-            <th>MBs</th>
-            <th>Precio</th>
-            <th>Días</th>
-            <th title="Costo estimado para 30 días, basado en tu consumo diario y la recompra del pack.">
-              Mensual <i class="fa fa-info-circle"></i></th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-        </tbody>
-      </table>
-    </section>
-
-    <footer class="nota">
-      <h3>Sobre "Datitos"</h3>
-      <p>
-        El ranking se ordena por tu gasto <span>Mensual</span> estimado. Este cálculo se basa en tu consumo diario,
-        asumiendo que recompras el pack si se te acaban los datos o cuando vence su duración.
-      </p>
-      <h4 id="copyright-notice">
-      </h4>
-    </footer>
-
-    <script src="script.js" defer></script>
-    <script>
-      const startYear = 2024;
-      const currentYear = new Date().getFullYear();
-      const copyrightElement = document.getElementById('copyright-notice');
-      let yearString = startYear.toString();
-      if (currentYear > startYear) {
-        yearString = `${startYear} - ${currentYear}`;
-      }
-      copyrightElement.textContent = `© ${yearString} CrysoK`;
-    </script>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 
 </html>
