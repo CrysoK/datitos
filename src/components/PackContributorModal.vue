@@ -12,6 +12,7 @@ import {
 } from 'lucide-vue-next';
 import type { Pack } from '../types';
 import { _, getGithubEditUrl } from '../utils';
+import { SUPPORTED_SCHEMA_VERSION } from '../services/packService';
 
 const props = defineProps<{
   show: boolean;
@@ -70,6 +71,7 @@ const generatedJson = computed(() => {
   };
 
   return JSON.stringify({
+    schema_version: SUPPORTED_SCHEMA_VERSION,
     updated_at: new Date().toISOString(),
     currency: currencyMap[props.country] || 'USD',
     packs

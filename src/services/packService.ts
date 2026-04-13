@@ -1,4 +1,5 @@
 import type { Pack } from '../types'
+export const SUPPORTED_SCHEMA_VERSION = 1
 
 const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/CrysoK/datitos-packs/main'
 const CACHE_KEY = 'cached_predefined_packs'
@@ -38,9 +39,13 @@ export const packService = {
     let maxSchemaVersion = 1
 
     const manifest = await this.fetchManifest()
-    if (!manifest) return { packs: [], schemaVersion: 1 }
+    if (!manifest) return { packs: [], schemaVersion: SUPPORTED_SCHEMA_VERSION }
 
     maxSchemaVersion = manifest.schema_version
+
+    if (maxSchemaVersion > SUPPORTED_SCHEMA_VERSION) {
+      console.warn(`[Schema] Manifest version (${maxSchemaVersion}) is higher than supported (${SUPPORTED_SCHEMA_VERSION}). Some features might not work as expected.`)
+    }
 
     const fetchPromises: Promise<Pack[]>[] = []
 
