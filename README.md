@@ -31,7 +31,7 @@ Desde la misma aplicación web:
 1. Selecciona la compañía que deseas actualizar.
 2. Haz clic en el botón **Actualizar datos comunitarios**.
 3. En el modal que se abre, ajusta los precios, megas o duración de los packs.
-4. Utiliza el botón final para copiar el JSON generado o ir directamente a GitHub para enviar la actualización (*Pull Request*).
+4. Haz clic en **Enviar a GitHub**. Se abrirá un formulario en GitHub con los datos cargados. Solo tienes que confirmar el envío del reporte y un bot procesará la actualización automáticamente.
 
 Repositorio de datos: [`datitos-packs`](https://github.com/CrysoK/datitos-packs)
 

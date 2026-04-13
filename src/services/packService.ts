@@ -65,6 +65,7 @@ export const packService = {
                 company: company.name,
                 type: file.type,
                 group: filename,
+                path: file.path,
                 id: p.id || Math.random()
               }))
 

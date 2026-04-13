@@ -99,9 +99,35 @@ export const beautifyGroupName = (name: string): string => {
     .join(' ')
 }
 
-export const getGithubEditUrl = (country: string, company: string, type: string) => {
+export const getGithubIssueUrl = (country: string, company: string, type: string, json: string, path?: string) => {
+  const title = `[CONTRIB] ${country} - ${company} (${type})`
+  const body = `### Datitos Bot: Nueva contribución
+
+Se ha generado una propuesta de actualización para **${company}** en **${country}** (${type}).
+
+${path ? `- **Archivo a modificar**: \`${path}\`` : ''}
+
+<!-- CONTRIBUTION_DATA_START -->
+\`\`\`json
+${json}
+\`\`\`
+<!-- CONTRIBUTION_DATA_END -->
+
+_Enviado desde la App de Datitos._`
+
+  return `https://github.com/CrysoK/datitos-packs/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}&labels=contribucion`
+}
+
+export const getGithubEditUrl = (country: string, company: string, path?: string) => {
+  const message = `[CONTRIB] ${country} ${company}: Actualizar packs`
+  const baseUrl = 'https://github.com/CrysoK/datitos-packs/edit/main'
+  
+  if (path) {
+    return `${baseUrl}/${path}?message=${encodeURIComponent(message)}`
+  }
+
+  // Fallback (por si acaso no hay path)
   const c = country.toLowerCase()
   const co = company.toLowerCase().replace(/\s+/g, '-')
-  const t = type === 'prepaid' ? 'prepago' : 'pospago'
-  return `https://github.com/CrysoK/datitos-packs/edit/main/${c}/${co}/${t}.json`
+  return `${baseUrl}/${c}/${co}/prepago.json?message=${encodeURIComponent(message)}`
 }

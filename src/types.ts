@@ -5,9 +5,10 @@ export interface Pack {
   price: number
   mb: number
   days: number
-  type?: 'prepaid' | 'postpaid'
+  type?: string
   group?: string
   comment?: string
+  path?: string
 }
 
 export type Message = {

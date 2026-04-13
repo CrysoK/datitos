@@ -11,15 +11,16 @@ import {
   ExternalLink as GithubIcon
 } from 'lucide-vue-next';
 import type { Pack } from '../types';
-import { _, getGithubEditUrl } from '../utils';
+import { _, getGithubIssueUrl } from '../utils';
 import { SUPPORTED_SCHEMA_VERSION } from '../services/packService';
 
 const props = defineProps<{
   show: boolean;
   country: string;
   company: string;
-  type: 'prepaid' | 'postpaid';
+  type: string;
   initialPacks: Pack[];
+  path?: string;
 }>();
 
 defineEmits(['close']);
@@ -89,8 +90,7 @@ const copyJson = async () => {
 };
 
 const openGithub = () => {
-  copyJson();
-  const url = getGithubEditUrl(props.country, props.company, props.type);
+  const url = getGithubIssueUrl(props.country, props.company, props.type, generatedJson.value, props.path);
   window.open(url, '_blank');
 };
 </script>
@@ -114,7 +114,8 @@ const openGithub = () => {
 
         <div class="modal-body">
           <div class="instructions">
-            <p>Ajustá los packs comunitarios. Al terminar, hacé clic en el botón para copiarlos y proponer el PR en GitHub.</p>
+            <p>Ajustá los packs comunitarios. Al terminar, enviá la propuesta a GitHub.</p>
+            <p class="sub-instruction">Se abrirá GitHub con el formulario ya completado. Solo tendrás que confirmar el envío del issue.</p>
           </div>
 
           <div class="packs-editor">
@@ -157,13 +158,13 @@ const openGithub = () => {
         <footer class="modal-footer">
           <p v-if="error" class="error-msg"><AlertCircle :size="16" /> {{ error }}</p>
           <div class="actions">
-            <button class="secondary-btn" @click="copyJson">
+            <button class="secondary-btn" @click="copyJson" title="Copiar JSON manualmente">
               <component :is="copied ? Check : Copy" :size="18" />
               {{ copied ? 'Copiado' : 'Copiar JSON' }}
             </button>
             <button class="primary-btn github-btn" @click="openGithub">
               <GithubIcon :size="18" />
-              Copiar y enviar PR
+              Enviar a GitHub
             </button>
           </div>
         </footer>
@@ -264,6 +265,12 @@ const openGithub = () => {
   font-size: 0.9375rem;
   color: #1e40af;
   line-height: 1.5;
+}
+
+.sub-instruction {
+  font-size: 0.8125rem;
+  opacity: 0.8;
+  margin-top: 0.25rem;
 }
 
 .packs-editor {

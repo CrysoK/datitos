@@ -273,11 +273,13 @@ const reportarError = () => {
 }
 
 const handleContribute = () => {
+  const communityPack = filteredPacks.value.find(p => p.isCommunity)
   emit('contribuir-pack', {
     country: filters.value.country,
     company: filters.value.company,
-    offer: filters.value.offer,
-    packs: filteredPacks.value
+    type: filters.value.offer,
+    packs: filteredPacks.value,
+    path: communityPack?.path
   })
 }
 
