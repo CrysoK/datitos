@@ -95,9 +95,14 @@
               <span class="compania-tag">{{ pack.company || 'Sin compañía' }}</span>
               <span v-if="pack.group" class="tipo-tag" :class="pack.type">{{ _(pack.group) }}</span>
             </div>
-            <strong>${{ calcularCosto(pack, usoDiario, diasUso, diasRestantes).toFixed(2) }}</strong> -
-            {{ pack.mb >= 1024 ? (pack.mb / 1024).toFixed(1) + 'GB' : pack.mb + 'MB' }} / 
-            {{ pack.days === 0 ? 'Hasta renovación' : pack.days + ' días' }}
+            <div class="pack-precio-container">
+              <strong>${{ calcularCosto(pack, usoDiario, diasUso, diasRestantes).toFixed(2) }}</strong>
+              <span class="precio-base" title="Precio por pack individual">(${{ pack.price }})</span>
+            </div>
+            <span class="pack-specs">
+              {{ pack.mb >= 1024 ? (pack.mb / 1024).toFixed(1) + 'GB' : pack.mb + 'MB' }} / 
+              {{ pack.days === 0 ? 'Hasta renovación' : pack.days + (pack.days === 1 ? ' día' : ' días') }}
+            </span>
             <div v-if="pack.comment" class="comentario">
               <MessageSquare :size="14" />
               {{ pack.comment }}
@@ -107,17 +112,17 @@
             <template v-if="pack.isCommunity">
               <button class="modificar-btn" @click="$emit('modificar-pack', pack)">
                 <PencilLine :size="16" />
-                Modificar
+                <span class="btn-text">Modificar</span>
               </button>
             </template>
             <template v-else>
               <button class="editar-btn" @click="$emit('editar', pack)">
                 <Pencil :size="16" />
-                Editar
+                <span class="btn-text">Editar</span>
               </button>
               <button class="eliminar-btn" @click="$emit('eliminar', pack.id)">
                 <Trash2 :size="16" />
-                Eliminar
+                <span class="btn-text">Eliminar</span>
               </button>
             </template>
           </div>
@@ -170,7 +175,8 @@ const filters = ref({
   offer: null as string | null
 })
 
-const showFilters = ref(window.innerWidth > 768)
+const showFilters = ref(false)
+let isInitialLoad = true
 
 // Persistence
 onMounted(() => {
@@ -181,6 +187,11 @@ onMounted(() => {
     filters.value.company = savedFilters.company
     filters.value.offer = savedFilters.offer
   }
+  
+  // Use a small timeout to ensure all watchers triggered by initialization are handled
+  setTimeout(() => {
+    isInitialLoad = false
+  }, 100)
 })
 
 watch(filters, (newVal) => {
@@ -195,6 +206,7 @@ watch(() => filters.value.country, () => {
 })
 
 watch(() => filters.value.company, () => {
+  if (isInitialLoad) return
   // We reset offer when company changes to avoid invalid combinations
   filters.value.offer = null
 })
@@ -304,9 +316,9 @@ const filterSummary = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .section-header h3 {
@@ -329,13 +341,13 @@ const filterSummary = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
   background: #f8fafc;
   border: 1px solid var(--color-borde);
   border-radius: 10px;
   cursor: pointer;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   font-size: 0.875rem;
   color: var(--color-texto-muted);
   transition: all 0.2s;
@@ -368,9 +380,9 @@ const filterSummary = computed(() => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
   background: #f1f5f9;
-  padding: 1.25rem;
+  padding: 1rem;
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
   border: 1px solid var(--color-borde);
@@ -542,12 +554,10 @@ const filterSummary = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background: #f8fafc;
-  border-radius: 1rem;
-  border: 1px solid var(--color-borde);
-  gap: 1.5rem;
+  margin: 0.25rem 0 0.75rem 0;
+  padding: 0.375rem 0.5rem;
+  border-bottom: 1px solid var(--color-borde);
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
@@ -597,5 +607,73 @@ const filterSummary = computed(() => {
 
 .pack-local {
   border-left: 4px solid #eab308;
+}
+.pack-precio-container {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.pack-info {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0 0.75rem;
+  min-width: 0;
+}
+
+.pack-meta {
+  grid-column: 1 / span 2;
+  display: flex;
+  gap: 0.375rem;
+  margin-bottom: 0.125rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pack-info strong {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-texto);
+}
+
+.precio-base {
+  font-size: 0.8125rem;
+  color: var(--color-texto-muted);
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.pack-specs {
+  color: var(--color-texto-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.comentario {
+  grid-column: 1 / span 2;
+  margin-top: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  background: #f8fafc;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-texto-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-left: 3px solid var(--color-borde);
+}
+
+@media (max-width: 480px) {
+  .btn-text {
+    display: none;
+  }
+  
+  .pack-acciones button {
+    padding: 0.5rem;
+  }
 }
 </style>
