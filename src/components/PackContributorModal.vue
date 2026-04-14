@@ -18,7 +18,7 @@ const props = defineProps<{
   show: boolean;
   country: string;
   company: string;
-  type: string;
+  listName: string;
   initialPacks: Pack[];
   path?: string;
 }>();
@@ -44,7 +44,6 @@ const addPack = () => {
     id: Math.random(),
     company: props.company,
     country: props.country,
-    type: props.type,
     mb: 0,
     price: 0,
     days: 0,
@@ -90,7 +89,7 @@ const copyJson = async () => {
 };
 
 const openGithub = () => {
-  const url = getGithubIssueUrl(props.country, props.company, props.type, generatedJson.value, props.path);
+  const url = getGithubIssueUrl(props.country, props.company, props.listName, generatedJson.value, props.path);
   window.open(url, '_blank');
 };
 </script>
@@ -104,7 +103,7 @@ const openGithub = () => {
             <Package :size="24" class="header-icon" />
             <div>
               <h3>Colaborar con {{ company }}</h3>
-              <p>{{ _(country) }} • {{ _(type) }}</p>
+              <p>{{ _(country) }} • {{ _(listName) }}</p>
             </div>
           </div>
           <button class="close-btn" @click="$emit('close')">

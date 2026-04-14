@@ -86,21 +86,10 @@ const handleSubmit = () => {
         <label for="mb">Datos (MB):</label>
         <input type="number" id="mb" required v-model.number="localPack.mb">
       </div>
-    </div>
 
-    <div class="input-grid duo">
       <div class="input-group">
         <label for="dias">Duración (días):</label>
         <input type="number" id="dias" required v-model.number="localPack.days">
-      </div>
-
-      <div class="input-group">
-        <label>Tipo de Plan:</label>
-        <select v-model="localPack.type">
-          <option :value="undefined">Sin especificar</option>
-          <option value="prepaid">Prepago</option>
-          <option value="postpaid">Abono / Pospago</option>
-        </select>
       </div>
     </div>
     
@@ -110,7 +99,7 @@ const handleSubmit = () => {
 
     <div class="input-group">
       <label for="grupo">Lista de packs (opcional):</label>
-      <input type="text" id="grupo" v-model="localPack.group" placeholder="Ej: Standard, Gold, Turistas, etc.">
+      <input type="text" id="grupo" v-model="localPack.group" placeholder="Ej: Prepago, Abono, Turistas, etc.">
     </div>
 
     <div class="input-group">

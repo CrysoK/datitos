@@ -8,8 +8,7 @@ describe('calcularCosto', () => {
     company: 'Test',
     price: 100,
     mb: 1000,
-    days: 7,
-    type: 'prepaid'
+    days: 7
   }
 
   it('calcula correctamente sin recarga', () => {
@@ -26,7 +25,7 @@ describe('calcularCosto', () => {
 
   it('maneja pack.days = 0 sin romperse', () => {
     const brokenPack = { ...samplePack, days: 0 }
-    expect(calcularCosto(brokenPack, 100, 7)).toBe(0)
+    expect(calcularCosto(brokenPack, 100, 7, 0)).toBe(0)
   })
 
   it('maneja diasUso = 0', () => {

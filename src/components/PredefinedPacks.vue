@@ -7,7 +7,7 @@
           <RefreshCw :size="16" :class="{ 'spin': loading }" />
           {{ loading ? 'Actualizando...' : 'Actualizar' }}
         </button>
-        <button class="nuevo-pack-btn" @click="$emit('nuevo-pack', { country: filters.country, company: filters.company, type: filters.offer })">
+        <button class="nuevo-pack-btn" @click="$emit('nuevo-pack', { country: filters.country, company: filters.company, group: filters.offer })">
           <PlusCircle :size="16" />
           Nuevo pack
         </button>
@@ -93,7 +93,7 @@
             <div class="pack-meta">
               <span v-if="!pack.isCommunity" class="propios-tag">Propio</span>
               <span class="compania-tag">{{ pack.company || 'Sin compañía' }}</span>
-              <span v-if="pack.group" class="tipo-tag" :class="pack.type">{{ _(pack.group) }}</span>
+              <span v-if="pack.group" class="tipo-tag">{{ _(pack.group) }}</span>
             </div>
             <div class="pack-precio-container">
               <strong>${{ calcularCosto(pack, usoDiario, diasUso, diasRestantes).toFixed(2) }}</strong>
@@ -243,28 +243,15 @@ const availableOffers = computed(() => {
     (!filters.value.company || p.company === filters.value.company)
   )
   
-  if (!filters.value.company) {
-    const types = [...new Set(packs.map(p => p.type))].filter(Boolean) as string[]
-    return types.map(t => ({ value: t, label: _(t) }))
-  } else {
-    const groups = [...new Set(packs.map(p => p.group))].filter(Boolean) as string[]
-    return groups.map(g => ({ value: g, label: _(g) }))
-  }
+  const lists = [...new Set(packs.map(p => p.group))].filter(Boolean) as string[]
+  return lists.map(l => ({ value: l, label: _(l) }))
 })
 
 const filteredPacks = computed(() => {
   return allPacksCombined.value.filter(p => {
     const countryMatch = p.country === filters.value.country
     const companyMatch = !filters.value.company || p.company === filters.value.company
-    
-    let offerMatch = true
-    if (filters.value.offer) {
-      if (!filters.value.company) {
-        offerMatch = p.type === filters.value.offer
-      } else {
-        offerMatch = p.group === filters.value.offer
-      }
-    }
+    const offerMatch = !filters.value.offer || p.group === filters.value.offer
     
     return countryMatch && companyMatch && offerMatch
   })
@@ -286,7 +273,7 @@ const handleContribute = () => {
   emit('contribuir-pack', {
     country: filters.value.country,
     company: filters.value.company,
-    type: filters.value.offer,
+    listName: filters.value.offer,
     packs: filteredPacks.value,
     path: communityPack?.path
   })

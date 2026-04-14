@@ -14,7 +14,6 @@ export interface PackManifest {
     companies: Array<{
       name: string
       files: Array<{
-        type: 'prepaid' | 'postpaid'
         path: string
         schema_version: number
       }>
@@ -60,13 +59,12 @@ export const packService = {
               if (!response.ok) throw new Error(`Failed to fetch ${file.path}`)
 
               const data = await response.json()
-              const filename = file.path.split('/').pop()?.replace('.json', '') || file.type
+              const fileName = file.path.split('/').pop()?.replace('.json', '') || 'Packs'
               const transformedPacks = (data.packs || []).map((p: any) => ({
                 ...p,
                 country: country.code,
                 company: company.name,
-                type: file.type,
-                group: filename,
+                group: fileName,
                 path: file.path,
                 id: p.id || Math.random()
               }))

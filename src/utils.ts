@@ -59,7 +59,6 @@ export const defaultPack = (): Pack => ({
   price: 0,
   mb: 0,
   days: 0,
-  type: undefined,
   group: undefined,
   comment: undefined
 })
@@ -71,8 +70,6 @@ export const detectUserCountry = (): string => {
 }
 
 let dynamicTranslations: Record<string, string> = {
-  "prepaid": "Prepago",
-  "postpaid": "Abono / Pospago",
 }
 
 export const setCountryTranslations = (map: Record<string, string>) => {
@@ -100,13 +97,17 @@ export const beautifyGroupName = (name: string): string => {
     .join(' ')
 }
 
-export const getGithubIssueUrl = (country: string, company: string, type: string, json: string, path?: string) => {
-  const title = `[CONTRIB] ${country} - ${company} (${type})`
+export const getGithubIssueUrl = (country: string, company: string, listName: string, json: string, path?: string) => {
+  const title = `[CONTRIB] ${country} - ${company} (${listName})`
+  
+  // Si no hay path, sugerimos uno basado en la estructura estándar
+  const finalPath = path || `${country.toLowerCase()}/${company.toLowerCase().replace(/\s+/g, '-')}/${listName.toLowerCase().replace(/\s+/g, '-')}.json`
+
   const body = `### Datitos Bot: Nueva contribución
 
-Se ha generado una propuesta de actualización para **${company}** en **${country}** (${type}).
+Se ha generado una propuesta de actualización para **${company}** en **${country}** (${listName}).
 
-${path ? `- **Archivo a modificar**: \`${path}\`` : ''}
+- **Archivo a modificar**: \`${finalPath}\`
 
 <!-- CONTRIBUTION_DATA_START -->
 \`\`\`json

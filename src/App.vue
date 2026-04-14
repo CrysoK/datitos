@@ -22,7 +22,7 @@ const showContributorModal = ref(false);
 const contributorData = ref({
   country: '',
   company: '',
-  type: 'prepaid' as 'prepaid' | 'postpaid',
+  listName: '',
   packs: [] as Pack[]
 });
 

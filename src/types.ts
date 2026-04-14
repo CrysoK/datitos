@@ -5,7 +5,6 @@ export interface Pack {
   price: number
   mb: number
   days: number
-  type?: string
   group?: string
   comment?: string
   path?: string
