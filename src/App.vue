@@ -39,7 +39,8 @@ const {
   deletePack,
   setEditingPack,
   resetEditingPack,
-  refreshPredefinedPacks
+  refreshPredefinedPacks,
+  countryNames
 } = usePacks()
 
 const openContributorModal = (data: any) => {
@@ -142,6 +143,7 @@ const appVersion = __APP_VERSION__
               id="pack-form-element"
               :pack="editingPack"
               :editing="!!editingPack.id"
+              :countries="countryNames"
               @submit="handleSavePack" 
               @reset="() => { resetEditingPack(); showPackModal = false }"
             />

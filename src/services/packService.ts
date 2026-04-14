@@ -34,12 +34,13 @@ export const packService = {
     }
   },
 
-  async fetchAllPacks(): Promise<{ packs: Pack[]; schemaVersion: number }> {
+  async fetchAllPacks(): Promise<{ packs: Pack[]; countryNames: Record<string, string>; schemaVersion: number }> {
     const allPacks: Pack[] = []
+    const countryNames: Record<string, string> = {}
     let maxSchemaVersion = 1
 
     const manifest = await this.fetchManifest()
-    if (!manifest) return { packs: [], schemaVersion: SUPPORTED_SCHEMA_VERSION }
+    if (!manifest) return { packs: [], countryNames: {}, schemaVersion: SUPPORTED_SCHEMA_VERSION }
 
     maxSchemaVersion = manifest.schema_version
 
@@ -50,6 +51,7 @@ export const packService = {
     const fetchPromises: Promise<Pack[]>[] = []
 
     manifest.countries.forEach((country) => {
+      countryNames[country.code] = country.name
       country.companies.forEach((company) => {
         company.files.forEach((file) => {
           const fetchPromise = (async () => {
@@ -85,28 +87,34 @@ export const packService = {
 
     return {
       packs: allPacks,
+      countryNames,
       schemaVersion: maxSchemaVersion
     }
   },
 
-  saveToCache(packs: Pack[], schemaVersion: number): void {
+  saveToCache(packs: Pack[], countryNames: Record<string, string>, schemaVersion: number): void {
     localStorage.setItem(
       CACHE_KEY,
       JSON.stringify({
         timestamp: Date.now(),
         schemaVersion,
-        data: packs
+        data: packs,
+        countryNames
       })
     )
   },
 
-  getCachedPacks(): { packs: Pack[]; schemaVersion: number } | null {
+  getCachedPacks(): { packs: Pack[]; countryNames: Record<string, string>; schemaVersion: number } | null {
     const cached = localStorage.getItem(CACHE_KEY)
     if (!cached) return null
 
     try {
-      const { data, schemaVersion } = JSON.parse(cached)
-      return { packs: data, schemaVersion: schemaVersion || 1 }
+      const { data, countryNames, schemaVersion } = JSON.parse(cached)
+      return { 
+        packs: data, 
+        countryNames: countryNames || {}, 
+        schemaVersion: schemaVersion || 1 
+      }
     } catch (e) {
       return null
     }

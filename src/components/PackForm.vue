@@ -13,6 +13,10 @@ const props = defineProps({
   editing: {
     type: Boolean,
     default: false
+  },
+  countries: {
+    type: Object as PropType<Record<string, string>>,
+    default: () => ({})
   }
 })
 
@@ -54,12 +58,16 @@ const handleSubmit = () => {
     <div class="input-grid">
       <div class="input-group">
         <label for="pais">País:</label>
-        <select id="pais" v-model="localPack.country">
-          <option value="AR">Argentina</option>
-          <option value="CL">Chile</option>
-          <option value="UY">Uruguay</option>
-          <option value="MX">México</option>
-        </select>
+        <input 
+          list="country-list" 
+          id="pais" 
+          v-model="localPack.country" 
+          placeholder="Ej: AR, Argentina..."
+          required
+        >
+        <datalist id="country-list">
+          <option v-for="(name, code) in countries" :key="code" :value="code">{{ name }}</option>
+        </datalist>
       </div>
 
       <div class="input-group">

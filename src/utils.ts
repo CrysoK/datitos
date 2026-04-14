@@ -70,17 +70,18 @@ export const detectUserCountry = (): string => {
   return country ? country.toUpperCase() : 'AR'
 }
 
+let dynamicTranslations: Record<string, string> = {
+  "prepaid": "Prepago",
+  "postpaid": "Abono / Pospago",
+}
+
+export const setCountryTranslations = (map: Record<string, string>) => {
+  dynamicTranslations = { ...dynamicTranslations, ...map }
+}
+
 export const _ = (str: string | undefined) => {
   if (!str) return 'Sin especificar'
-  const translations: Record<string, string> = {
-    "prepaid": "Prepago",
-    "postpaid": "Abono / Pospago",
-    "AR": "Argentina",
-    "CL": "Chile",
-    "UY": "Uruguay",
-    "MX": "México"
-  }
-  return translations[str] || beautifyGroupName(str)
+  return dynamicTranslations[str] || beautifyGroupName(str)
 }
 
 export const beautifyGroupName = (name: string): string => {

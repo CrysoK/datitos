@@ -1,5 +1,5 @@
 import { ref, watch, onMounted, computed } from 'vue'
-import { guardarEnLocalStorage, cargarDesdeLocalStorage, defaultPack, calcularDiasHastaRenovacion, migrateLegacyData } from '../utils'
+import { guardarEnLocalStorage, cargarDesdeLocalStorage, defaultPack, calcularDiasHastaRenovacion, migrateLegacyData, setCountryTranslations } from '../utils'
 import type { Pack } from '../types'
 import { packService } from '../services/packService'
 
@@ -7,6 +7,7 @@ export function usePacks() {
   const packs = ref<Pack[]>(cargarDesdeLocalStorage<Pack[]>('packs') || [])
   const cachedData = packService.getCachedPacks()
   const predefinedPacks = ref<Pack[]>(cachedData?.packs || [])
+  const countryNames = ref<Record<string, string>>(cachedData?.countryNames || {})
   const dataSchemaVersion = ref<number>(cachedData?.schemaVersion || 1)
   const loadingPredefined = ref(false)
   const usoDiarioGlobal = ref(300)
@@ -41,6 +42,8 @@ export function usePacks() {
 
     if (predefinedPacks.value.length === 0) {
       refreshPredefinedPacks()
+    } else {
+      setCountryTranslations(countryNames.value)
     }
   })
 
@@ -81,11 +84,13 @@ export function usePacks() {
   const refreshPredefinedPacks = async () => {
     loadingPredefined.value = true
     try {
-      const { packs: data, schemaVersion } = await packService.fetchAllPacks()
+      const { packs: data, countryNames: names, schemaVersion } = await packService.fetchAllPacks()
       if (data.length > 0) {
         predefinedPacks.value = data
+        countryNames.value = names
         dataSchemaVersion.value = schemaVersion
-        packService.saveToCache(data, schemaVersion)
+        setCountryTranslations(names)
+        packService.saveToCache(data, names, schemaVersion)
       }
     } finally {
       loadingPredefined.value = false
@@ -102,6 +107,7 @@ export function usePacks() {
     diaRenovacionGlobal,
     diasHastaRenovacion,
     editingPack,
+    countryNames,
     savePack,
     deletePack,
     setEditingPack,
