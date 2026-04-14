@@ -3,12 +3,6 @@
     <div class="section-header">
       <h3>Comparar Packs</h3>
       <div class="header-btns">
-        <button class="filter-toggle-btn" :class="{ 'active': showFilters }" @click="toggleFilters">
-          <Filter :size="16" />
-          <span>Filtros</span>
-          <ChevronDown v-if="!showFilters" :size="16" />
-          <ChevronUp v-else :size="16" />
-        </button>
         <button class="refresh-btn" :class="{ loading }" @click="$emit('refresh-predefined')" :disabled="loading">
           <RefreshCw :size="16" :class="{ 'spin': loading }" />
           {{ loading ? 'Actualizando...' : 'Actualizar' }}
@@ -20,10 +14,14 @@
       </div>
     </div>
 
-    <div v-if="!showFilters" class="filter-summary-bar" @click="showFilters = true">
-      <Filter :size="14" />
-      <span>{{ filterSummary }}</span>
-    </div>
+    <button class="filter-summary-bar" :class="{ 'active': showFilters }" @click="showFilters = !showFilters">
+      <div class="summary-content">
+        <Filter :size="14" />
+        <span>{{ filterSummary }}</span>
+      </div>
+      <ChevronDown v-if="!showFilters" :size="16" />
+      <ChevronUp v-else :size="16" />
+    </button>
 
     <div v-show="showFilters" class="filters-container">
       <div class="filter-group">
@@ -173,7 +171,6 @@ const filters = ref({
 })
 
 const showFilters = ref(window.innerWidth > 768)
-const toggleFilters = () => showFilters.value = !showFilters.value
 
 // Persistence
 onMounted(() => {
@@ -326,50 +323,58 @@ const filterSummary = computed(() => {
   flex-wrap: wrap;
 }
 
-.filter-toggle-btn {
-  background: white;
-  border: 1px solid var(--color-borde);
-  color: var(--color-texto);
-  padding: 0.5rem 0.75rem;
-  white-space: nowrap;
-}
 
-.filter-toggle-btn:hover {
-  background: #f8fafc;
-  border-color: var(--color-primario);
-  color: var(--color-primario);
-}
-
-.filter-toggle-btn.active {
-  background: #eef2ff;
-  border-color: var(--color-primario);
-  color: var(--color-primario);
-}
 
 .filter-summary-bar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   background: #f8fafc;
   border: 1px solid var(--color-borde);
   border-radius: 10px;
   cursor: pointer;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   font-size: 0.875rem;
   color: var(--color-texto-muted);
   transition: all 0.2s;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  user-select: none;
 }
 
-.filter-summary-bar:hover {
+.filter-summary-bar.active {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-bottom: 0;
   background: #f1f5f9;
   border-color: var(--color-borde);
-  color: var(--color-texto);
+}
+
+.summary-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .filter-summary-bar span {
   font-weight: 600;
   color: var(--color-primario);
+}
+
+.filters-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: #f1f5f9;
+  padding: 1.25rem;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  border: 1px solid var(--color-borde);
+  border-top: none;
 }
 
 @media (max-width: 640px) {
@@ -390,15 +395,12 @@ const filterSummary = computed(() => {
     order: 1;
   }
   
-  .filter-toggle-btn {
+  .refresh-btn {
+    grid-column: span 2;
     order: 2;
   }
   
-  .refresh-btn {
-    order: 3;
-  }
-  
-  .filter-toggle-btn, .refresh-btn, .nuevo-pack-btn {
+  .refresh-btn, .nuevo-pack-btn {
     width: 100%;
     margin: 0;
   }
@@ -494,16 +496,7 @@ const filterSummary = computed(() => {
   cursor: pointer;
 }
 
-.filters-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-  background: #f8fafc;
-  padding: 1.25rem;
-  border-radius: 12px;
-  border: 1px solid var(--color-borde);
-}
+
 
 @media (max-width: 640px) {
   .filters-container {
