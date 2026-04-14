@@ -131,3 +131,69 @@ export const getGithubEditUrl = (country: string, company: string, path?: string
   const co = company.toLowerCase().replace(/\s+/g, '-')
   return `${baseUrl}/${c}/${co}/prepago.json?message=${encodeURIComponent(message)}`
 }
+
+export const migrateLegacyData = () => {
+  const legacyItems = localStorage.getItem('items')
+  const legacyDiario = localStorage.getItem('diario')
+  const legacyRenovacion = localStorage.getItem('renovacion')
+
+  if (!legacyItems && !legacyDiario && !legacyRenovacion) return null
+
+  console.log('[Migration] Legacy data detected. Starting migration...')
+
+  let migratedPacks: Pack[] = []
+  let migratedConfig: any = null
+
+  if (legacyItems) {
+    try {
+      const items = JSON.parse(legacyItems)
+      if (Array.isArray(items)) {
+        migratedPacks = items.map((item: any, index: number) => ({
+          id: Date.now() + index,
+          country: detectUserCountry(),
+          company: 'Desconocida',
+          price: Number(item.precio) || 0,
+          mb: Number(item.mbs) || 0,
+          days: Number(item.dias) || 0,
+          comment: item.nombre
+        }))
+      }
+    } catch (e) {
+      console.error('[Migration] Error parsing legacy items:', e)
+    }
+  }
+
+  if (legacyDiario !== null || legacyRenovacion !== null) {
+    migratedConfig = {
+      usoDiario: legacyDiario ? Number(legacyDiario) : 300,
+      diasUso: 30,
+      diaRenovacion: 1
+    }
+
+    if (legacyRenovacion) {
+      // Extraemos el día directamente del string YYYY-MM-DD para evitar problemas de zona horaria
+      const parts = legacyRenovacion.split('-')
+      if (parts.length === 3) {
+        migratedConfig.diaRenovacion = parseInt(parts[2])
+      } else {
+        const date = new Date(legacyRenovacion)
+        if (!isNaN(date.getTime())) {
+          migratedConfig.diaRenovacion = date.getDate()
+        }
+      }
+    }
+  }
+
+  // Cleanup
+  localStorage.removeItem('items')
+  localStorage.removeItem('diario')
+  localStorage.removeItem('renovacion')
+  localStorage.removeItem('ultimoId')
+
+  console.log('[Migration] Migration complete.', { migratedPacks, migratedConfig })
+
+  return {
+    packs: migratedPacks,
+    config: migratedConfig
+  }
+}

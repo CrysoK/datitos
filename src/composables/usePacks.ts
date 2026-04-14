@@ -1,5 +1,5 @@
 import { ref, watch, onMounted, computed } from 'vue'
-import { guardarEnLocalStorage, cargarDesdeLocalStorage, defaultPack, calcularDiasHastaRenovacion } from '../utils'
+import { guardarEnLocalStorage, cargarDesdeLocalStorage, defaultPack, calcularDiasHastaRenovacion, migrateLegacyData } from '../utils'
 import type { Pack } from '../types'
 import { packService } from '../services/packService'
 
@@ -18,6 +18,20 @@ export function usePacks() {
 
   // Cargar configuración inicial
   onMounted(() => {
+    // Migración de datos desde versión vanilla
+    const migrated = migrateLegacyData()
+    if (migrated) {
+      if (migrated.packs.length > 0) {
+        packs.value = [...packs.value, ...migrated.packs]
+        guardarEnLocalStorage('packs', packs.value)
+      }
+      if (migrated.config) {
+        usoDiarioGlobal.value = migrated.config.usoDiario
+        diaRenovacionGlobal.value = migrated.config.diaRenovacion
+        // La persistencia se encargará el watcher, pero aseguramos estado inicial
+      }
+    }
+
     const config = cargarDesdeLocalStorage<{ usoDiario: number; diasUso: number; diaRenovacion: number }>('config')
     if (config) {
       usoDiarioGlobal.value = config.usoDiario || 300
