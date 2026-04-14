@@ -7,18 +7,8 @@ const MANIFEST_URL = `${GITHUB_RAW_BASE}/manifest.json`
 
 export interface PackManifest {
   last_updated: string
-  schema_version: number
-  countries: Array<{
-    code: string
-    name: string
-    companies: Array<{
-      name: string
-      files: Array<{
-        path: string
-        schema_version: number
-      }>
-    }>
-  }>
+  country_names: Record<string, string>
+  files: string[]
 }
 
 export const packService = {
@@ -35,53 +25,58 @@ export const packService = {
 
   async fetchAllPacks(): Promise<{ packs: Pack[]; countryNames: Record<string, string>; schemaVersion: number }> {
     const allPacks: Pack[] = []
-    const countryNames: Record<string, string> = {}
     let maxSchemaVersion = 1
 
     const manifest = await this.fetchManifest()
     if (!manifest) return { packs: [], countryNames: {}, schemaVersion: SUPPORTED_SCHEMA_VERSION }
 
-    maxSchemaVersion = manifest.schema_version
+    const countryNames = manifest.country_names || {}
+    const files = manifest.files || []
 
-    if (maxSchemaVersion > SUPPORTED_SCHEMA_VERSION) {
-      console.warn(`[Schema] Manifest version (${maxSchemaVersion}) is higher than supported (${SUPPORTED_SCHEMA_VERSION}). Some features might not work as expected.`)
-    }
+    const fetchPromises = files.map((filePath) => (async () => {
+      try {
+        const response = await fetch(`${GITHUB_RAW_BASE}/${filePath}`)
+        if (!response.ok) throw new Error(`Failed to fetch ${filePath}`)
 
-    const fetchPromises: Promise<Pack[]>[] = []
+        const data = await response.json()
+        const version = data.schema_version || 1
+        
+        // Track the maximum schema version found to alert about compatibility
+        if (version > maxSchemaVersion) {
+          maxSchemaVersion = version
+        }
 
-    manifest.countries.forEach((country) => {
-      countryNames[country.code] = country.name
-      country.companies.forEach((company) => {
-        company.files.forEach((file) => {
-          const fetchPromise = (async () => {
-            try {
-              const response = await fetch(`${GITHUB_RAW_BASE}/${file.path}`)
-              if (!response.ok) throw new Error(`Failed to fetch ${file.path}`)
+        // Infer metadata from path: ar/claro/prepago.json
+        const parts = filePath.split('/')
+        if (parts.length < 3) return []
 
-              const data = await response.json()
-              const fileName = file.path.split('/').pop()?.replace('.json', '') || 'Packs'
-              const transformedPacks = (data.packs || []).map((p: any) => ({
-                ...p,
-                country: country.code,
-                company: company.name,
-                group: fileName,
-                path: file.path,
-                id: p.id || Math.random()
-              }))
+        const countryCode = parts[0].toUpperCase()
+        const companySlug = parts[1]
+        const companyName = companySlug.charAt(0).toUpperCase() + companySlug.slice(1)
+        const groupName = parts[parts.length - 1].replace('.json', '')
 
-              return transformedPacks
-            } catch (error) {
-              console.error(`Error fetching packs from ${file.path}:`, error)
-              return []
-            }
-          })()
-          fetchPromises.push(fetchPromise)
-        })
-      })
-    })
+        const transformedPacks = (data.packs || []).map((p: any) => ({
+          ...p,
+          country: countryCode,
+          company: companyName,
+          group: groupName,
+          path: filePath,
+          id: p.id || Math.random()
+        }))
+
+        return transformedPacks
+      } catch (error) {
+        console.error(`Error fetching packs from ${filePath}:`, error)
+        return []
+      }
+    })())
 
     const results = await Promise.all(fetchPromises)
     results.forEach((packs) => allPacks.push(...packs))
+
+    if (maxSchemaVersion > SUPPORTED_SCHEMA_VERSION) {
+      console.warn(`[Schema] Some packs use version (${maxSchemaVersion}) which is higher than supported (${SUPPORTED_SCHEMA_VERSION}).`)
+    }
 
     return {
       packs: allPacks,

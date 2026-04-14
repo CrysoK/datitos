@@ -69,16 +69,17 @@ export const detectUserCountry = (): string => {
   return country ? country.toUpperCase() : 'AR'
 }
 
-let dynamicTranslations: Record<string, string> = {
-}
+import { shallowRef } from 'vue'
+
+let dynamicTranslations = shallowRef<Record<string, string>>({})
 
 export const setCountryTranslations = (map: Record<string, string>) => {
-  dynamicTranslations = { ...dynamicTranslations, ...map }
+  dynamicTranslations.value = { ...dynamicTranslations.value, ...map }
 }
 
 export const _ = (str: string | undefined) => {
   if (!str) return 'Sin especificar'
-  return dynamicTranslations[str] || beautifyGroupName(str)
+  return dynamicTranslations.value[str] || beautifyGroupName(str)
 }
 
 export const beautifyGroupName = (name: string): string => {

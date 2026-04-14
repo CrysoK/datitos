@@ -10,6 +10,7 @@ import PredefinedPacks from './components/PredefinedPacks.vue'
 import PackContributorModal from './components/PackContributorModal.vue'
 import NotFound from './components/NotFound.vue'
 import { usePacks } from './composables/usePacks'
+import { _ } from './utils'
 import type { Pack } from './types'
 
 const route = useRoute();
@@ -133,7 +134,7 @@ const appVersion = __APP_VERSION__
           <header class="modal-header">
             <div class="header-info">
               <h3>{{ editingPack.id ? 'Editar Pack' : 'Nuevo Pack' }}</h3>
-              <p v-if="editingPack.company">{{ editingPack.company }} • {{ editingPack.country }}</p>
+              <p v-if="editingPack.company">{{ editingPack.company }} • {{ _(editingPack.country) }}</p>
             </div>
             <button class="close-btn" @click="showPackModal = false">&times;</button>
           </header>
