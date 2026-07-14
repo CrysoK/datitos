@@ -1,3 +1,17 @@
 /// <reference types="vite/client" />
 
 declare const __APP_VERSION__: string
+
+interface Window {
+  dataLayer?: any[];
+  gtag?: (...args: any[]) => void;
+}
+
+interface ImportMetaEnv {
+  readonly VITE_GA_ID?: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
