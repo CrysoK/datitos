@@ -68,6 +68,10 @@
     <div v-if="filteredPacks.length === 0" class="empty-state">
       <AlertTriangle :size="48" />
       <p>No se encontraron packs para esta selección</p>
+      <button class="nueva-lista-btn" @click="handleNewList">
+        <PlusCircle :size="16" />
+        Contribuir nueva lista
+      </button>
     </div>
 
     <div v-else>
@@ -76,10 +80,16 @@
           ¿Encontraste datos incorrectos?
           <a href="#" @click.prevent="reportarError">Reportar error</a>
         </div>
-        <button v-if="filters.company && filters.offer" class="reportar-btn colaborar-btn" @click="handleContribute">
-          <Zap :size="16" />
-          Actualizar datos comunitarios
-        </button>
+        <div class="contribuir-btns">
+          <button class="nueva-lista-btn" @click="handleNewList">
+            <PlusCircle :size="16" />
+            Contribuir nueva lista
+          </button>
+          <button v-if="filters.company && filters.offer" class="reportar-btn colaborar-btn" @click="handleContribute">
+            <Zap :size="16" />
+            Actualizar datos comunitarios
+          </button>
+        </div>
       </div>
 
       <div class="packs">
@@ -266,6 +276,16 @@ const sortedPacks = computed(() => {
 
 const reportarError = () => {
   window.open('https://github.com/CrysoK/datitos-packs/issues/new', '_blank')
+}
+
+const handleNewList = () => {
+  emit('contribuir-pack', {
+    country: filters.value.country,
+    company: filters.value.company || '',
+    listName: '',
+    packs: [],
+    path: undefined
+  })
 }
 
 const handleContribute = () => {
@@ -558,6 +578,24 @@ const filterSummary = computed(() => {
 .colaborar-btn:hover {
   background: #dcfce7;
   border-color: #86efac;
+}
+
+.contribuir-btns {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.nueva-lista-btn {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  padding: 0.5rem 1rem;
+}
+
+.nueva-lista-btn:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
 }
 
 @media (max-width: 640px) {

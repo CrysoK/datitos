@@ -24,7 +24,8 @@ const contributorData = ref({
   country: '',
   company: '',
   listName: '',
-  packs: [] as Pack[]
+  packs: [] as Pack[],
+  path: undefined as string | undefined
 });
 
 const {
@@ -165,6 +166,7 @@ const appVersion = __APP_VERSION__
         :show="showContributorModal" 
         v-bind="contributorData" 
         :initial-packs="contributorData.packs"
+        :country-names="countryNames"
         @close="showContributorModal = false" 
       />
     </main>

@@ -11,7 +11,7 @@ import {
   ExternalLink as GithubIcon
 } from 'lucide-vue-next';
 import type { Pack } from '../types';
-import { _, getGithubIssueUrl } from '../utils';
+import { _, getGithubIssueUrl, ALL_COUNTRY_CODES, getCountryDisplayName } from '../utils';
 import { SUPPORTED_SCHEMA_VERSION } from '../services/packService';
 
 const props = defineProps<{
@@ -26,24 +26,65 @@ const props = defineProps<{
 defineEmits(['close']);
 
 const localPacks = ref<Pack[]>([]);
+const localCountry = ref('');
+const localCompany = ref('');
+const localListName = ref('');
 const copied = ref(false);
 const error = ref('');
 
+const isCreating = computed(() => !props.path);
+
+const canSubmit = computed(() => {
+  const hasMetadata = isCreating.value
+    ? !!(localCountry.value.trim() && localCompany.value.trim() && localListName.value.trim())
+    : true;
+  const hasValidPacks = localPacks.value.length > 0
+    && localPacks.value.some(p => p.mb > 0 && p.price > 0);
+  return hasMetadata && hasValidPacks;
+});
+
+// Pre-compute country options once (avoids calling getCountryDisplayName per render)
+const countryOptions = ALL_COUNTRY_CODES.map(code => ({
+  code,
+  name: getCountryDisplayName(code)
+}));
+
 watch(() => props.show, (newVal) => {
   if (newVal) {
-    localPacks.value = JSON.parse(JSON.stringify(props.initialPacks)).map((p: Pack) => ({
-      ...p,
-      id: p.id || Math.random()
-    }));
+    localCountry.value = props.country || '';
+    localCompany.value = props.company || '';
+    localListName.value = props.listName || '';
+
+    if (isCreating.value && props.initialPacks.length === 0) {
+      // Start with one empty pack template
+      localPacks.value = [{
+        id: Math.random(),
+        company: props.company || '',
+        country: props.country || '',
+        mb: 0,
+        price: 0,
+        days: 0,
+        comment: ''
+      }];
+    } else {
+      localPacks.value = JSON.parse(JSON.stringify(props.initialPacks)).map((p: Pack) => ({
+        ...p,
+        id: p.id || Math.random()
+      }));
+    }
     error.value = '';
   }
 });
 
+const effectiveCountry = computed(() => isCreating.value ? localCountry.value : props.country);
+const effectiveCompany = computed(() => isCreating.value ? localCompany.value : props.company);
+const effectiveListName = computed(() => isCreating.value ? localListName.value : props.listName);
+
 const addPack = () => {
   localPacks.value.push({
     id: Math.random(),
-    company: props.company,
-    country: props.country,
+    company: effectiveCompany.value,
+    country: effectiveCountry.value,
     mb: 0,
     price: 0,
     days: 0,
@@ -73,7 +114,7 @@ const generatedJson = computed(() => {
   return JSON.stringify({
     schema_version: SUPPORTED_SCHEMA_VERSION,
     updated_at: new Date().toISOString(),
-    currency: currencyMap[props.country] || 'USD',
+    currency: currencyMap[effectiveCountry.value.toUpperCase()] || 'USD',
     packs
   }, null, 2);
 });
@@ -89,7 +130,16 @@ const copyJson = async () => {
 };
 
 const openGithub = () => {
-  const url = getGithubIssueUrl(props.country, props.company, props.listName, generatedJson.value, props.path);
+  if (!canSubmit.value) {
+    error.value = isCreating.value
+      ? 'Completá país, empresa, nombre de lista y al menos un pack válido.'
+      : 'Agregá al menos un pack con MB y precio válidos.';
+    return;
+  }
+  const url = getGithubIssueUrl(
+    effectiveCountry.value, effectiveCompany.value, effectiveListName.value,
+    generatedJson.value, props.path
+  );
   window.open(url, '_blank');
 };
 </script>
@@ -101,9 +151,13 @@ const openGithub = () => {
         <header class="modal-header">
           <div class="header-info">
             <Package :size="24" class="header-icon" />
-            <div>
+            <div v-if="!isCreating">
               <h3>Colaborar con {{ company }}</h3>
               <p>{{ _(country) }} • {{ _(listName) }}</p>
+            </div>
+            <div v-else>
+              <h3>Contribuir nueva lista</h3>
+              <p>Completá los datos para crear una nueva lista de packs</p>
             </div>
           </div>
           <button class="close-btn" @click="$emit('close')">
@@ -113,8 +167,35 @@ const openGithub = () => {
 
         <div class="modal-body">
           <div class="instructions">
-            <p>Ajustá los packs comunitarios. Al terminar, enviá la propuesta a GitHub.</p>
+            <p v-if="isCreating">Completá la información de la nueva lista y agregá los packs. Al terminar, enviá la propuesta a GitHub.</p>
+            <p v-else>Ajustá los packs comunitarios. Al terminar, enviá la propuesta a GitHub.</p>
             <p class="sub-instruction">Se abrirá GitHub con el formulario ya completado. Solo tendrás que confirmar el envío del issue.</p>
+          </div>
+
+          <div v-if="isCreating" class="metadata-section">
+            <div class="metadata-row">
+              <div class="input-field">
+                <label>País</label>
+                <input 
+                  list="contributor-country-list" 
+                  v-model="localCountry" 
+                  placeholder="Ej: AR, UY..."
+                >
+                <datalist id="contributor-country-list">
+                  <option v-for="opt in countryOptions" :key="opt.code" :value="opt.code">
+                    {{ opt.name }}
+                  </option>
+                </datalist>
+              </div>
+              <div class="input-field">
+                <label>Empresa</label>
+                <input type="text" v-model="localCompany" placeholder="Ej: Claro, Movistar...">
+              </div>
+              <div class="input-field">
+                <label>Nombre de la lista</label>
+                <input type="text" v-model="localListName" placeholder="Ej: Prepago, Abono...">
+              </div>
+            </div>
           </div>
 
           <div class="packs-editor">
@@ -161,7 +242,11 @@ const openGithub = () => {
               <component :is="copied ? Check : Copy" :size="18" />
               {{ copied ? 'Copiado' : 'Copiar JSON' }}
             </button>
-            <button class="primary-btn github-btn" @click="openGithub">
+            <button 
+              class="primary-btn github-btn" 
+              :disabled="!canSubmit" 
+              @click="openGithub"
+            >
               <GithubIcon :size="18" />
               Enviar a GitHub
             </button>
@@ -270,6 +355,21 @@ const openGithub = () => {
   font-size: 0.8125rem;
   opacity: 0.8;
   margin-top: 0.25rem;
+}
+
+/* Metadata inputs for create mode */
+.metadata-section {
+  margin-bottom: 2rem;
+}
+
+.metadata-row {
+  display: grid;
+  grid-template-columns: 120px 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.metadata-row .input-field input {
+  padding: 0.5rem 0.75rem;
 }
 
 .packs-editor {
@@ -398,16 +498,21 @@ const openGithub = () => {
   color: white;
 }
 
-.primary-btn:hover {
+.primary-btn:hover:not(:disabled) {
   background: var(--color-primario-hover);
   transform: translateY(-1px);
+}
+
+.primary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .github-btn {
   background: #24292f;
 }
 
-.github-btn:hover {
+.github-btn:hover:not(:disabled) {
   background: #000;
 }
 
@@ -435,6 +540,9 @@ const openGithub = () => {
   }
   .input-field.shrink {
     flex: 1;
+  }
+  .metadata-row {
+    grid-template-columns: 1fr;
   }
 }
 </style>

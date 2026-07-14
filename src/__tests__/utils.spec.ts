@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calcularCosto } from '../utils'
+import { calcularCosto, slugify } from '../utils'
 import type { Pack } from '../types'
 
 describe('calcularCosto', () => {
@@ -30,5 +30,35 @@ describe('calcularCosto', () => {
 
   it('maneja diasUso = 0', () => {
     expect(calcularCosto(samplePack, 100, 0)).toBe(0)
+  })
+})
+
+describe('slugify', () => {
+  it('convierte espacios a guiones', () => {
+    expect(slugify('Datos Prepago')).toBe('datos-prepago')
+  })
+
+  it('elimina caracteres especiales', () => {
+    expect(slugify('Movistar (4G)')).toBe('movistar-4g')
+  })
+
+  it('maneja múltiples espacios', () => {
+    expect(slugify('  Mi   Operadora  ')).toBe('mi-operadora')
+  })
+
+  it('maneja acentos y ñ', () => {
+    expect(slugify('Prepago Ñoño')).toBe('prepago-oo')
+  })
+
+  it('devuelve string vacío para input vacío', () => {
+    expect(slugify('')).toBe('')
+  })
+
+  it('genera slug correcto para el path de contribución', () => {
+    const country = 'UY'
+    const company = 'Claro'
+    const listName = 'Prepago'
+    const path = `${country.toLowerCase()}/${slugify(company)}/${slugify(listName)}.json`
+    expect(path).toBe('uy/claro/prepago.json')
   })
 })
