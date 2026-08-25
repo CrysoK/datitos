@@ -93,7 +93,7 @@
       </div>
 
       <div class="packs">
-        <div v-for="(pack, index) in sortedPacks" :key="pack.id || index" class="pack-item" :class="{ 
+        <div v-for="(pack, index) in sortedPacks" :key="pack.id ?? index" class="pack-item" :class="{ 
           'best-value': index === 0,
           'pack-predefinido': pack.isCommunity,
           'pack-local': !pack.isCommunity

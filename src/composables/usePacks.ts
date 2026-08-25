@@ -68,7 +68,7 @@ export function usePacks() {
     editingPack.value = defaultPack()
   }
 
-  const deletePack = (id: number) => {
+  const deletePack = (id: Pack['id']) => {
     packs.value = packs.value.filter((p) => p.id !== id)
     guardarEnLocalStorage('packs', packs.value)
   }

@@ -1,5 +1,5 @@
 export interface Pack {
-  id?: number
+  id?: number | string
   country?: string
   company: string
   price: number

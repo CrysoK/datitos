@@ -5,6 +5,20 @@ const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/CrysoK/datitos-packs/
 const CACHE_KEY = 'cached_predefined_packs'
 const MANIFEST_URL = `${GITHUB_RAW_BASE}/manifest.json`
 
+/** Id estable de un pack comunitario: path del JSON + índice dentro de ese archivo. */
+export const communityPackId = (path: string, index: number): string => `${path}#${index}`
+
+/** Recalcula ids por archivo. Pisa valores aleatorios de cachés viejos. */
+export const withCommunityPackIds = (packs: Pack[]): Pack[] => {
+  const indexByPath = new Map<string, number>()
+  return packs.map((pack) => {
+    if (!pack.path) return pack
+    const index = indexByPath.get(pack.path) ?? 0
+    indexByPath.set(pack.path, index + 1)
+    return { ...pack, id: communityPackId(pack.path, index) }
+  })
+}
+
 export interface PackManifest {
   last_updated: string
   country_names: Record<string, string>
@@ -55,16 +69,15 @@ export const packService = {
         const companyName = companySlug.charAt(0).toUpperCase() + companySlug.slice(1)
         const groupName = parts[parts.length - 1].replace('.json', '')
 
-        const transformedPacks = (data.packs || []).map((p: any) => ({
+        const transformedPacks = (data.packs || []).map((p: Record<string, unknown>) => ({
           ...p,
           country: countryCode,
           company: companyName,
           group: groupName,
-          path: filePath,
-          id: p.id || Math.random()
-        }))
+          path: filePath
+        })) as Pack[]
 
-        return transformedPacks
+        return withCommunityPackIds(transformedPacks)
       } catch (error) {
         console.error(`Error fetching packs from ${filePath}:`, error)
         return []
@@ -91,7 +104,7 @@ export const packService = {
       JSON.stringify({
         timestamp: Date.now(),
         schemaVersion,
-        data: packs,
+        data: withCommunityPackIds(packs),
         countryNames
       })
     )
@@ -102,13 +115,22 @@ export const packService = {
     if (!cached) return null
 
     try {
-      const { data, countryNames, schemaVersion } = JSON.parse(cached)
-      return { 
-        packs: data, 
-        countryNames: countryNames || {}, 
-        schemaVersion: schemaVersion || 1 
+      const parsed = JSON.parse(cached)
+      const { data, countryNames, schemaVersion } = parsed
+      if (!Array.isArray(data)) return null
+
+      const packs = withCommunityPackIds(data)
+      const idsChanged = packs.some((pack, i) => pack.id !== data[i]?.id)
+      if (idsChanged) {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ ...parsed, data: packs }))
       }
-    } catch (e) {
+
+      return {
+        packs,
+        countryNames: countryNames || {},
+        schemaVersion: schemaVersion || 1
+      }
+    } catch {
       return null
     }
   }

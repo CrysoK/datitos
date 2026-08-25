@@ -92,7 +92,7 @@ const addPack = () => {
   });
 };
 
-const removePack = (id: number | undefined) => {
+const removePack = (id: Pack['id']) => {
   localPacks.value = localPacks.value.filter(p => p.id !== id);
 };
 
