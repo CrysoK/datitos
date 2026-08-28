@@ -120,9 +120,9 @@
           </div>
           <div class="pack-acciones">
             <template v-if="pack.isCommunity">
-              <button class="modificar-btn" @click="$emit('modificar-pack', pack)">
-                <PencilLine :size="16" />
-                <span class="btn-text">Modificar</span>
+              <button class="copiar-btn" @click="$emit('modificar-pack', pack)">
+                <Copy :size="16" />
+                <span class="btn-text">Copiar</span>
               </button>
             </template>
             <template v-else>
@@ -145,7 +145,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import type { PropType } from 'vue'
-import { Pencil, Trash2, PencilLine, AlertTriangle, MessageSquare, Zap, RefreshCw, PlusCircle, Filter, ChevronDown, ChevronUp } from 'lucide-vue-next'
+import { Pencil, Trash2, Copy, AlertTriangle, MessageSquare, Zap, RefreshCw, PlusCircle, Filter, ChevronDown, ChevronUp } from 'lucide-vue-next'
 import type { Pack } from '../types'
 import { calcularCosto, _, detectUserCountry, guardarEnLocalStorage, cargarDesdeLocalStorage } from '../utils'
 
@@ -619,14 +619,14 @@ const filterSummary = computed(() => {
   letter-spacing: 0.05em;
 }
 
-.modificar-btn {
+.copiar-btn {
   background: #f1f5f9;
   color: var(--color-texto);
   padding: 0.375rem 0.75rem;
   font-size: 0.8125rem;
 }
 
-.modificar-btn:hover {
+.copiar-btn:hover {
   background: #e2e8f0;
 }
 
