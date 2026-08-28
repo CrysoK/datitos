@@ -99,12 +99,12 @@
           'pack-local': !pack.isCommunity
         }">
           <div v-if="index === 0" class="best-badge">Mejor opción</div>
+          <div class="pack-meta">
+            <span v-if="!pack.isCommunity" class="propios-tag">Propio</span>
+            <span class="compania-tag">{{ pack.company || 'Sin compañía' }}</span>
+            <span v-if="pack.group" class="tipo-tag">{{ _(pack.group) }}</span>
+          </div>
           <div class="pack-info">
-            <div class="pack-meta">
-              <span v-if="!pack.isCommunity" class="propios-tag">Propio</span>
-              <span class="compania-tag">{{ pack.company || 'Sin compañía' }}</span>
-              <span v-if="pack.group" class="tipo-tag">{{ _(pack.group) }}</span>
-            </div>
             <div class="pack-precio-container">
               <strong>${{ calcularCosto(pack, usoDiario, diasUso, diasRestantes).toFixed(2) }}</strong>
               <span class="precio-base" title="Precio por pack individual">(${{ pack.price }})</span>
@@ -113,10 +113,6 @@
               {{ pack.mb >= 1024 ? (pack.mb / 1024).toFixed(1) + 'GB' : pack.mb + 'MB' }} / 
               {{ pack.days === 0 ? 'Hasta renovación' : pack.days + (pack.days === 1 ? ' día' : ' días') }}
             </span>
-            <div v-if="pack.comment" class="comentario">
-              <MessageSquare :size="14" />
-              {{ pack.comment }}
-            </div>
           </div>
           <div class="pack-acciones">
             <template v-if="pack.isCommunity">
@@ -135,6 +131,10 @@
                 <span class="btn-text">Eliminar</span>
               </button>
             </template>
+          </div>
+          <div v-if="pack.comment" class="comentario">
+            <MessageSquare :size="14" />
+            {{ pack.comment }}
           </div>
         </div>
       </div>
@@ -553,8 +553,12 @@ const filterSummary = computed(() => {
   text-align: left;
   font-size: 0.875rem;
   color: var(--color-texto-muted);
-  white-space: nowrap;
   margin: 0;
+  min-width: 0;
+}
+
+.aviso-reporte a {
+  white-space: nowrap;
 }
 
 .contribuir-container {
@@ -619,17 +623,6 @@ const filterSummary = computed(() => {
   letter-spacing: 0.05em;
 }
 
-.copiar-btn {
-  background: #f1f5f9;
-  color: var(--color-texto);
-  padding: 0.375rem 0.75rem;
-  font-size: 0.8125rem;
-}
-
-.copiar-btn:hover {
-  background: #e2e8f0;
-}
-
 .pack-local {
   border-left: 4px solid #eab308;
 }
@@ -642,7 +635,6 @@ const filterSummary = computed(() => {
 }
 
 .pack-info {
-  flex: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -651,10 +643,9 @@ const filterSummary = computed(() => {
 }
 
 .pack-meta {
-  grid-column: 1 / span 2;
+  grid-column: 1 / -1;
   display: flex;
   gap: 0.375rem;
-  margin-bottom: 0.125rem;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -681,8 +672,9 @@ const filterSummary = computed(() => {
 }
 
 .comentario {
-  grid-column: 1 / span 2;
-  margin-top: 0.25rem;
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin-top: 0;
   padding: 0.375rem 0.75rem;
   background: #f8fafc;
   border-radius: 0.5rem;
@@ -698,11 +690,6 @@ const filterSummary = computed(() => {
   .pack-info {
     grid-template-columns: 1fr;
     gap: 0.125rem 0;
-  }
-
-  .pack-meta,
-  .comentario {
-    grid-column: 1;
   }
 
   .pack-specs {
