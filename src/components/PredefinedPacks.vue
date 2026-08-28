@@ -637,6 +637,8 @@ const filterSummary = computed(() => {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
+  min-width: 0;
+  flex-wrap: wrap;
 }
 
 .pack-info {
@@ -690,6 +692,23 @@ const filterSummary = computed(() => {
   align-items: center;
   gap: 0.375rem;
   border-left: 3px solid var(--color-borde);
+}
+
+@media (max-width: 640px) {
+  .pack-info {
+    grid-template-columns: 1fr;
+    gap: 0.125rem 0;
+  }
+
+  .pack-meta,
+  .comentario {
+    grid-column: 1;
+  }
+
+  .pack-specs {
+    text-align: left;
+    white-space: normal;
+  }
 }
 
 @media (max-width: 480px) {
