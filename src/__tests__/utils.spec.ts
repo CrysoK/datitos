@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { calcularCosto, slugify } from '../utils'
+import { describe, it, expect, afterEach, vi } from 'vitest'
+import { calcularCosto, slugify, detectUserCountry } from '../utils'
 import type { Pack } from '../types'
 
 describe('calcularCosto', () => {
@@ -60,5 +60,45 @@ describe('slugify', () => {
     const listName = 'Prepago'
     const path = `${country.toLowerCase()}/${slugify(company)}/${slugify(listName)}.json`
     expect(path).toBe('uy/claro/prepago.json')
+  })
+})
+
+describe('detectUserCountry', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  const stubLanguages = (language: string, languages: string[] = [language]) => {
+    vi.stubGlobal('navigator', { language, languages })
+  }
+
+  it('es-AR → AR', () => {
+    stubLanguages('es-AR')
+    expect(detectUserCountry()).toBe('AR')
+  })
+
+  it('es-419 → AR', () => {
+    stubLanguages('es-419')
+    expect(detectUserCountry()).toBe('AR')
+  })
+
+  it('es → AR', () => {
+    stubLanguages('es')
+    expect(detectUserCountry()).toBe('AR')
+  })
+
+  it('es-CL → CL', () => {
+    stubLanguages('es-CL')
+    expect(detectUserCountry()).toBe('CL')
+  })
+
+  it('es-Latn-AR → AR', () => {
+    stubLanguages('es-Latn-AR')
+    expect(detectUserCountry()).toBe('AR')
+  })
+
+  it('usa el primer país válido de navigator.languages', () => {
+    stubLanguages('es-419', ['es-419', 'es-CL', 'es'])
+    expect(detectUserCountry()).toBe('CL')
   })
 })

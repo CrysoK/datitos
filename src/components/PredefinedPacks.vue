@@ -147,7 +147,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import type { PropType } from 'vue'
 import { Pencil, Trash2, Copy, AlertTriangle, MessageSquare, Zap, RefreshCw, PlusCircle, Filter, ChevronDown, ChevronUp } from 'lucide-vue-next'
 import type { Pack } from '../types'
-import { calcularCosto, _, detectUserCountry, guardarEnLocalStorage, cargarDesdeLocalStorage } from '../utils'
+import { calcularCosto, _, detectUserCountry, guardarEnLocalStorage, cargarDesdeLocalStorage, isValidCountryCode } from '../utils'
 
 const props = defineProps({
   predefinedPacks: {
@@ -193,9 +193,14 @@ onMounted(() => {
   const savedFilters = cargarDesdeLocalStorage<{ source: string; country: string; company: string | null; offer: string | null }>('predefined_filters')
   if (savedFilters) {
     if (savedFilters.source) filters.value.source = savedFilters.source as any
-    if (savedFilters.country) filters.value.country = savedFilters.country
+    if (isValidCountryCode(savedFilters.country)) {
+      filters.value.country = savedFilters.country.toUpperCase()
+    }
     filters.value.company = savedFilters.company
     filters.value.offer = savedFilters.offer
+    if (savedFilters.country && !isValidCountryCode(savedFilters.country)) {
+      guardarEnLocalStorage('predefined_filters', filters.value)
+    }
   }
   
   // Use a small timeout to ensure all watchers triggered by initialization are handled
