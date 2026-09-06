@@ -3,7 +3,13 @@
     <div class="section-header">
       <h3>Comparar Packs</h3>
       <div class="header-btns">
-        <button class="refresh-btn" :class="{ loading }" @click="$emit('refresh-predefined')" :disabled="loading">
+        <button
+          class="refresh-btn"
+          :class="{ loading }"
+          :disabled="loading || !isOnline"
+          :title="isOnline ? undefined : 'Sin conexión'"
+          @click="$emit('refresh-predefined')"
+        >
           <RefreshCw :size="16" :class="{ 'spin': loading }" />
           {{ loading ? 'Actualizando...' : 'Actualizar' }}
         </button>
@@ -61,8 +67,9 @@
 
     <div v-else-if="predefinedPacks.length === 0" class="empty-state">
       <AlertTriangle :size="48" />
-      <p>No se encontraron packs precargados</p>
-      <button class="retry-btn" @click="$emit('refresh-predefined')">Intentar cargar de nuevo</button>
+      <p v-if="!isOnline">Sin conexión y no hay packs guardados en este dispositivo. Conectate una vez para descargarlos.</p>
+      <p v-else>No se encontraron packs precargados</p>
+      <button v-if="isOnline" class="retry-btn" @click="$emit('refresh-predefined')">Intentar cargar de nuevo</button>
     </div>
 
     <div v-if="filteredPacks.length === 0" class="empty-state">
@@ -148,6 +155,7 @@ import type { PropType } from 'vue'
 import { Pencil, Trash2, Copy, AlertTriangle, MessageSquare, Zap, RefreshCw, PlusCircle, Filter, ChevronDown, ChevronUp } from 'lucide-vue-next'
 import type { Pack } from '../types'
 import { calcularCosto, _, detectUserCountry, guardarEnLocalStorage, cargarDesdeLocalStorage, isValidCountryCode } from '../utils'
+import { useOnlineStatus } from '../composables/useOnlineStatus'
 
 const props = defineProps({
   predefinedPacks: {
@@ -177,6 +185,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['modificar-pack', 'editar', 'eliminar', 'nuevo-pack', 'reportar-pack', 'contribuir-pack', 'refresh-predefined'])
+const { isOnline } = useOnlineStatus()
 
 const filters = ref({
   source: 'all' as 'all' | 'community' | 'local',

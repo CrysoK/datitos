@@ -2,14 +2,16 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { Settings2 } from 'lucide-vue-next'
+import { Settings2, WifiOff } from 'lucide-vue-next'
 
 import ConfigModal from './components/ConfigModal.vue'
 import PackForm from './components/PackForm.vue'
 import PredefinedPacks from './components/PredefinedPacks.vue'
 import PackContributorModal from './components/PackContributorModal.vue'
 import NotFound from './components/NotFound.vue'
+import InstallHint from './components/InstallHint.vue'
 import { usePacks } from './composables/usePacks'
+import { useOnlineStatus } from './composables/useOnlineStatus'
 import { _ } from './utils'
 import type { Pack } from './types'
 
@@ -78,6 +80,7 @@ const handleSavePack = (pack: Pack) => {
 };
 
 const appVersion = __APP_VERSION__
+const { isOnline } = useOnlineStatus()
 </script>
 
 <template>
@@ -94,9 +97,15 @@ const appVersion = __APP_VERSION__
           <Settings2 :size="18" />
           <span>Configurar uso</span>
         </button>
+        <span v-if="!isOnline" class="offline-tag" title="Mostrando datos guardados en este dispositivo">
+          <WifiOff :size="14" />
+          Sin conexión
+        </span>
         <span class="version-tag">v{{ appVersion }}</span>
       </div>
     </header>
+
+    <InstallHint />
 
     <main v-if="isNotFound">
       <NotFound />
@@ -267,6 +276,19 @@ const appVersion = __APP_VERSION__
   cursor: pointer;
   line-height: 1;
   color: var(--color-texto-muted);
+}
+
+.offline-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.625rem;
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fdba74;
+  border-radius: 2rem;
+  font-weight: 600;
 }
 
 </style>

@@ -9,7 +9,7 @@
 - 📦 **Packs comunitarios:** Base de datos precargada de compañías en varios países (Argentina, Chile, Uruguay, México, etc.). Los datos se obtienen del repositorio [`datitos-packs`](https://github.com/CrysoK/datitos-packs).
 - ➕ **Packs personalizados:** Permite crear y evaluar packs de forma local. Es ideal para cuando las listas comunitarias están desactualizadas, o para calcular ofertas especiales que te ofrezca tu compañía y no figuren en el sistema.
 - 🤝 **Colaboración integrada:** Herramienta visual incorporada para modificar precios desactualizados, generar el JSON automáticamente y enviar la actualización al repositorio de datos.
-- 📱 **Diseño responsivo y PWA:** Interfaz moderna, rápida, adaptable a móviles e instalable como aplicación nativa.
+- 📱 **Diseño responsivo y PWA:** Interfaz adaptable a móviles, instalable y usable sin conexión tras la primera visita. Los packs ya descargados quedan en el dispositivo.
 
 ## 🧠 ¿Cómo funciona el cálculo?
 
