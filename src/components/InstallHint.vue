@@ -10,7 +10,7 @@ const { isOnline } = useOnlineStatus()
 <template>
   <aside v-if="visible && isOnline" class="install-hint" role="note">
     <Smartphone :size="16" class="hint-icon" aria-hidden="true" />
-    <p v-if="canPrompt">Instalala para abrirla sin datos.</p>
+    <p v-if="canPrompt">Instalar para usar sin datos</p>
     <p v-else>En Safari: Compartir → Agregar a inicio.</p>
     <button v-if="canPrompt" type="button" class="install-btn" @click="install">
       Instalar
