@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
-import { calcularCosto, slugify, detectUserCountry } from '../utils'
+import { calcularCosto, slugify, detectUserCountry, setUserCountry, fetchUserCountry, _ } from '../utils'
 import type { Pack } from '../types'
 
 describe('calcularCosto', () => {
@@ -63,42 +63,72 @@ describe('slugify', () => {
   })
 })
 
-describe('detectUserCountry', () => {
+describe('detectUserCountry y fetchUserCountry', () => {
   afterEach(() => {
     vi.unstubAllGlobals()
+    vi.restoreAllMocks()
+    setUserCountry('AR')
   })
 
-  const stubLanguages = (language: string, languages: string[] = [language]) => {
-    vi.stubGlobal('navigator', { language, languages })
-  }
-
-  it('es-AR → AR', () => {
-    stubLanguages('es-AR')
+  it('detectUserCountry devuelve AR por defecto', () => {
     expect(detectUserCountry()).toBe('AR')
   })
 
-  it('es-419 → AR', () => {
-    stubLanguages('es-419')
-    expect(detectUserCountry()).toBe('AR')
-  })
-
-  it('es → AR', () => {
-    stubLanguages('es')
-    expect(detectUserCountry()).toBe('AR')
-  })
-
-  it('es-CL → CL', () => {
-    stubLanguages('es-CL')
+  it('setUserCountry actualiza el país actual si es válido', () => {
+    setUserCountry('CL')
+    expect(detectUserCountry()).toBe('CL')
+    setUserCountry('invalid')
     expect(detectUserCountry()).toBe('CL')
   })
 
-  it('es-Latn-AR → AR', () => {
-    stubLanguages('es-Latn-AR')
-    expect(detectUserCountry()).toBe('AR')
+  it('fetchUserCountry obtiene el país desde /api/country', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ country: 'cl' })
+    }))
+
+    const result = await fetchUserCountry()
+    expect(result).toBe('CL')
+    expect(detectUserCountry()).toBe('CL')
   })
 
-  it('usa el primer país válido de navigator.languages', () => {
-    stubLanguages('es-419', ['es-419', 'es-CL', 'es'])
-    expect(detectUserCountry()).toBe('CL')
+  it('fetchUserCountry cae en AR si la respuesta no es ok o el código es inválido', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: false
+    }))
+
+    const result = await fetchUserCountry()
+    expect(result).toBe('AR')
+  })
+
+  it('fetchUserCountry cae en AR si hay un error de red u offline', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('Network error')))
+
+    const result = await fetchUserCountry()
+    expect(result).toBe('AR')
+  })
+})
+
+describe('_ (traducciones y formato)', () => {
+  it('formatea nombres de países según código ISO', () => {
+    expect(_('AR')).toBe('Argentina')
+    expect(_('CL')).toBe('Chile')
+    expect(_('UY')).toBe('Uruguay')
+    expect(_('US')).toBe('Estados Unidos')
+  })
+
+  it('traduce grupos predefinidos', () => {
+    expect(_('prepago')).toBe('Prepago')
+    expect(_('abono')).toBe('Abono')
+    expect(_('pospago')).toBe('Pospago')
+  })
+
+  it('capitaliza grupos no estándar', () => {
+    expect(_('con_factura')).toBe('Con Factura')
+  })
+
+  it('maneja valores vacíos', () => {
+    expect(_(undefined)).toBe('Sin especificar')
+    expect(_('')).toBe('Sin especificar')
   })
 })

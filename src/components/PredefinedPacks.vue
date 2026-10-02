@@ -154,7 +154,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import type { PropType } from 'vue'
 import { Pencil, Trash2, Copy, AlertTriangle, MessageSquare, Zap, RefreshCw, PlusCircle, Filter, ChevronDown, ChevronUp } from 'lucide-vue-next'
 import type { Pack } from '../types'
-import { calcularCosto, _, detectUserCountry, guardarEnLocalStorage, cargarDesdeLocalStorage, isValidCountryCode } from '../utils'
+import { calcularCosto, _, detectUserCountry, fetchUserCountry, guardarEnLocalStorage, cargarDesdeLocalStorage, isValidCountryCode } from '../utils'
 import { useOnlineStatus } from '../composables/useOnlineStatus'
 
 const props = defineProps({
@@ -197,11 +197,23 @@ const filters = ref({
 const showFilters = ref(false)
 let isInitialLoad = true
 
+const countries = computed(() => {
+  const c1 = props.predefinedPacks.map(p => p.country)
+  const c2 = props.localPacks.map(p => p.country)
+  return [...new Set([...c1, ...c2].filter(Boolean))] as string[]
+})
+
+const ensureValidCountry = () => {
+  if (countries.value.length > 0 && !countries.value.includes(filters.value.country)) {
+    filters.value.country = countries.value.includes('AR') ? 'AR' : countries.value[0]
+  }
+}
+
 // Persistence
-onMounted(() => {
+onMounted(async () => {
   const savedFilters = cargarDesdeLocalStorage<{ source: string; country: string; company: string | null; offer: string | null }>('predefined_filters')
   if (savedFilters) {
-    if (savedFilters.source) filters.value.source = savedFilters.source as any
+    if (savedFilters.source) filters.value.source = savedFilters.source as 'all' | 'community' | 'local'
     if (isValidCountryCode(savedFilters.country)) {
       filters.value.country = savedFilters.country.toUpperCase()
     }
@@ -210,13 +222,22 @@ onMounted(() => {
     if (savedFilters.country && !isValidCountryCode(savedFilters.country)) {
       guardarEnLocalStorage('predefined_filters', filters.value)
     }
+  } else {
+    const detected = await fetchUserCountry()
+    filters.value.country = detected
   }
+
+  ensureValidCountry()
   
   // Use a small timeout to ensure all watchers triggered by initialization are handled
   setTimeout(() => {
     isInitialLoad = false
   }, 100)
 })
+
+watch(countries, () => {
+  ensureValidCountry()
+}, { immediate: true })
 
 watch(filters, (newVal) => {
   guardarEnLocalStorage('predefined_filters', newVal)
@@ -233,12 +254,6 @@ watch(() => filters.value.company, () => {
   if (isInitialLoad) return
   // We reset offer when company changes to avoid invalid combinations
   filters.value.offer = null
-})
-
-const countries = computed(() => {
-  const c1 = props.predefinedPacks.map(p => p.country)
-  const c2 = props.localPacks.map(p => p.country)
-  return [...new Set([...c1, ...c2].filter(Boolean))] as string[]
 })
 
 const companies = computed(() => {

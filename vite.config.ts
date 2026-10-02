@@ -13,6 +13,15 @@ export default defineConfig({
   plugins: [
     vue(),
     vueJsx(),
+    {
+      name: 'dev-api-country',
+      configureServer(server) {
+        server.middlewares.use('/api/country', (_req, res) => {
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify({ country: 'AR', source: 'vite-dev' }))
+        })
+      }
+    },
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
@@ -32,7 +41,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,json,txt,woff2}'],
         globIgnores: ['**/__online'],
         navigateFallback: 'index.html',
-        navigateFallbackDenylist: [/^\/__online/],
+        navigateFallbackDenylist: [/^\/__online/, /^\/api\//],
         runtimeCaching: [
           {
             urlPattern: /\/__online(?:\?|$)/,

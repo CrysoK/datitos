@@ -71,28 +71,45 @@ export const ALL_COUNTRY_CODES: readonly string[] = ISO_CODES.split(',')
 export const isValidCountryCode = (code: string | null | undefined): boolean =>
   !!code && ALL_COUNTRY_CODES.includes(code.toUpperCase())
 
-const countryFromLanguageTag = (tag: string): string | undefined => {
+const countryDisplayNames = new Intl.DisplayNames(['es'], { type: 'region' })
+
+export const getCountryDisplayName = (code: string): string => {
   try {
-    const region = new Intl.Locale(tag.replace(/_/g, '-')).region
-    return region && isValidCountryCode(region) ? region.toUpperCase() : undefined
+    return countryDisplayNames.of(code.toUpperCase()) || code
   } catch {
-    return undefined
+    return code
   }
 }
 
-export const detectUserCountry = (): string => {
-  const tags = [navigator.language, ...(navigator.languages ?? [])]
-  for (const tag of tags) {
-    if (!tag) continue
-    const country = countryFromLanguageTag(tag)
-    if (country) return country
+let userCountry = 'AR'
+
+export const detectUserCountry = (): string => userCountry
+
+export const setUserCountry = (code: string) => {
+  if (isValidCountryCode(code)) {
+    userCountry = code.toUpperCase()
   }
-  return 'AR'
+}
+
+export const fetchUserCountry = async (): Promise<string> => {
+  try {
+    const res = await fetch('/api/country')
+    if (res.ok) {
+      const data = await res.json()
+      if (isValidCountryCode(data?.country)) {
+        userCountry = data.country.toUpperCase()
+        return userCountry
+      }
+    }
+  } catch {
+    // Fallback silencioso si está offline, en desarrollo o falla la red
+  }
+  return userCountry
 }
 
 import { shallowRef } from 'vue'
 
-let dynamicTranslations = shallowRef<Record<string, string>>({})
+const dynamicTranslations = shallowRef<Record<string, string>>({})
 
 export const setCountryTranslations = (map: Record<string, string>) => {
   dynamicTranslations.value = { ...dynamicTranslations.value, ...map }
@@ -100,7 +117,9 @@ export const setCountryTranslations = (map: Record<string, string>) => {
 
 export const _ = (str: string | undefined) => {
   if (!str) return 'Sin especificar'
-  return dynamicTranslations.value[str] || beautifyGroupName(str)
+  if (dynamicTranslations.value[str]) return dynamicTranslations.value[str]
+  if (isValidCountryCode(str)) return getCountryDisplayName(str)
+  return beautifyGroupName(str)
 }
 
 export const beautifyGroupName = (name: string): string => {
@@ -121,16 +140,6 @@ export const beautifyGroupName = (name: string): string => {
 
 export const slugify = (str: string): string =>
   str.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-
-const countryDisplayNames = new Intl.DisplayNames(['es'], { type: 'region' })
-
-export const getCountryDisplayName = (code: string): string => {
-  try {
-    return countryDisplayNames.of(code.toUpperCase()) || code
-  } catch {
-    return code
-  }
-}
 
 export const getGithubIssueUrl = (country: string, company: string, listName: string, json: string, path?: string) => {
   const title = `[CONTRIB] ${country} - ${company} (${listName})`
